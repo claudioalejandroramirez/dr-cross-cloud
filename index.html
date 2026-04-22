@@ -1,603 +1,1066 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Plano de Contingenciamento & DR Cross-Cloud — Documento Executivo</title>
-<link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plano de Contingenciamento & DR Cross-Cloud — Documento Executivo</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
-<div id="document-content">
-  <div class="cover">
-    <div class="cover-badge">Documento Executivo & Técnico — Confidencial</div>
-    <h1>Plano de <span>Contingenciamento & Disaster Recovery</span> Cross-Cloud</h1>
-    <p class="subtitle">Estratégia de Resiliência Multi-Cloud para Arquitetura Event-Driven em AWS Lambda com Failover Ativo-Passivo — Go-Live: Janeiro 2027</p>
-    <div class="cover-meta">
-      <div class="cover-meta-item"><label>Classificação</label><p>Confidencial — C-Level & Diretoria</p></div>
-      <div class="cover-meta-item"><label>Elaborado por</label><p>Principal Solutions Architect / EPM</p></div>
-      <div class="cover-meta-item"><label>Data de Início</label><p>15 Abril 2026</p></div>
-      <div class="cover-meta-item"><label>Go-Live Target</label><p>Janeiro 2027</p></div>
-      <div class="cover-meta-item"><label>Versão</label><p>2.1 — Fontes Oficiais / Cronograma Ajustado</p></div>
+  <div id="document-content">
+    <div class="cover">
+      <div class="cover-badge">Documento Executivo & Técnico — Confidencial</div>
+      <h1>Plano de <span>Contingenciamento & Disaster Recovery</span> Cross-Cloud</h1>
+      <p class="subtitle">Estratégia de Resiliência Multi-Cloud para Arquitetura Event-Driven em AWS Lambda com Failover
+        Ativo-Passivo — Go-Live: Janeiro 2027</p>
+      <div class="cover-meta">
+        <div class="cover-meta-item"><label>Classificação</label>
+          <p>Confidencial — C-Level & Diretoria</p>
+        </div>
+        <div class="cover-meta-item"><label>Elaborado por</label>
+          <p>Principal Solutions Architect / EPM</p>
+        </div>
+        <div class="cover-meta-item"><label>Data de Início</label>
+          <p>15 Abril 2026</p>
+        </div>
+        <div class="cover-meta-item"><label>Go-Live Target</label>
+          <p>Janeiro 2027</p>
+        </div>
+        <div class="cover-meta-item"><label>Versão</label>
+          <p>2.1 — Fontes Oficiais / Cronograma Ajustado</p>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <div class="container">
+    <div class="container">
 
-    <div class="kpi-row">
-      <div class="kpi accent"><label>Prazo Total</label><div class="val">~9</div><div class="sub">meses até Go-Live</div></div>
-      <div class="kpi blue"><label>Fases do Projeto</label><div class="val">5</div><div class="sub">fases cronológicas</div></div>
-      <div class="kpi green"><label>Modelo DR</label><div class="val">A-P</div><div class="sub">Ativo-Passivo (Warm Standby)</div></div>
-      <div class="kpi red"><label>Risco Mitigado</label><div class="val">Crítico</div><div class="sub">Vendor Lock-in + Regional Outage</div></div>
-    </div>
-
-    <div class="section">
-      <div class="section-header">
-        <div class="section-num">1</div>
-        <h2>Roadmap Macro & Cronograma de Execução</h2>
-        <span class="section-tag">Timeline Abr/2026 → Jan/2027</span>
+      <div class="kpi-row">
+        <div class="kpi accent"><label>Prazo Total</label>
+          <div class="val">~9</div>
+          <div class="sub">meses até Go-Live</div>
+        </div>
+        <div class="kpi blue"><label>Fases do Projeto</label>
+          <div class="val">5</div>
+          <div class="sub">fases cronológicas</div>
+        </div>
+        <div class="kpi green"><label>Modelo DR</label>
+          <div class="val">A-P</div>
+          <div class="sub">Ativo-Passivo (Warm Standby)</div>
+        </div>
+        <div class="kpi red"><label>Risco Mitigado</label>
+          <div class="val">Crítico</div>
+          <div class="sub">Vendor Lock-in + Regional Outage</div>
+        </div>
       </div>
 
-      <div class="card" style="margin-bottom:24px;">
-        <div class="card-title"><span class="dot" style="background:var(--blue)"></span>Gantt Visual — Visão Macro por Mês</div>
-        <div id="gantt-container" style="overflow-x:auto;">
-          <table class="gantt" id="gantt-table">
+      <div class="section">
+        <div class="section-header">
+          <div class="section-num">1</div>
+          <h2>Roadmap Macro & Cronograma de Execução</h2>
+          <span class="section-tag">Timeline Abr/2026 → Jan/2027</span>
+        </div>
+
+        <div class="card" style="margin-bottom:24px;">
+          <div class="card-title"><span class="dot" style="background:var(--blue)"></span>Gantt Visual — Visão Macro por
+            Mês</div>
+          <div id="gantt-container" style="overflow-x:auto;">
+            <table class="gantt" id="gantt-table">
+              <thead>
+                <tr>
+                  <th style="text-align:left; min-width:180px;">Frente / Fase</th>
+                  <th>Abr 26</th>
+                  <th>Mai 26</th>
+                  <th>Jun 26</th>
+                  <th>Jul 26</th>
+                  <th>Ago 26</th>
+                  <th>Set 26</th>
+                  <th>Out 26</th>
+                  <th>Nov 26</th>
+                  <th>Dez 26</th>
+                  <th>Jan 27</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="row-label">F1 — Assessment & Triage</td>
+                  <td class="cell-bar">
+                    <div class="bar bar-blue" style="width:100%"></div>
+                  </td>
+                  <td class="cell-bar">
+                    <div class="bar bar-blue" style="width:60%"></div>
+                  </td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                </tr>
+                <tr>
+                  <td class="row-label">🎯 PITCH EXECUTIVO (Go/No-Go)</td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar" style="text-align:center;"><span
+                      style="background:var(--accent);color:var(--navy);padding:2px 8px;border-radius:6px;font-weight:800;font-size:11px;">MÊS
+                      2</span></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                </tr>
+                <tr>
+                  <td class="row-label">F2 — RFQ & PoC Cloud B</td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar">
+                    <div class="bar bar-orange" style="width:40%"></div>
+                  </td>
+                  <td class="cell-bar">
+                    <div class="bar bar-orange" style="width:100%"></div>
+                  </td>
+                  <td class="cell-bar">
+                    <div class="bar bar-orange" style="width:100%"></div>
+                  </td>
+                  <td class="cell-bar">
+                    <div class="bar bar-orange" style="width:50%"></div>
+                  </td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                </tr>
+                <tr>
+                  <td class="row-label">F3 — Engenharia / Decoupling</td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar">
+                    <div class="bar bar-purple" style="width:50%"></div>
+                  </td>
+                  <td class="cell-bar">
+                    <div class="bar bar-purple" style="width:100%"></div>
+                  </td>
+                  <td class="cell-bar">
+                    <div class="bar bar-purple" style="width:100%"></div>
+                  </td>
+                  <td class="cell-bar">
+                    <div class="bar bar-purple" style="width:100%"></div>
+                  </td>
+                  <td class="cell-bar">
+                    <div class="bar bar-purple" style="width:100%"></div>
+                  </td>
+                  <td class="cell-bar">
+                    <div class="bar bar-purple" style="width:50%"></div>
+                  </td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                </tr>
+                <tr>
+                  <td class="row-label">║ IaC / Terraform (paralelo)</td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar">
+                    <div class="bar bar-gray" style="width:100%"></div>
+                  </td>
+                  <td class="cell-bar">
+                    <div class="bar bar-gray" style="width:100%"></div>
+                  </td>
+                  <td class="cell-bar">
+                    <div class="bar bar-gray" style="width:100%"></div>
+                  </td>
+                  <td class="cell-bar">
+                    <div class="bar bar-gray" style="width:100%"></div>
+                  </td>
+                  <td class="cell-bar">
+                    <div class="bar bar-gray" style="width:100%"></div>
+                  </td>
+                  <td class="cell-bar">
+                    <div class="bar bar-gray" style="width:50%"></div>
+                  </td>
+                  <td class="cell-bar"></td>
+                </tr>
+                <tr>
+                  <td class="row-label">║ Observabilidade Unificada</td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar">
+                    <div class="bar bar-gray" style="width:100%"></div>
+                  </td>
+                  <td class="cell-bar">
+                    <div class="bar bar-gray" style="width:100%"></div>
+                  </td>
+                  <td class="cell-bar">
+                    <div class="bar bar-gray" style="width:100%"></div>
+                  </td>
+                  <td class="cell-bar">
+                    <div class="bar bar-gray" style="width:100%"></div>
+                  </td>
+                  <td class="cell-bar">
+                    <div class="bar bar-gray" style="width:50%"></div>
+                  </td>
+                  <td class="cell-bar"></td>
+                </tr>
+                <tr>
+                  <td class="row-label">F4 — Staging & Chaos Eng.</td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar">
+                    <div class="bar bar-red" style="width:30%"></div>
+                  </td>
+                  <td class="cell-bar">
+                    <div class="bar bar-red" style="width:100%"></div>
+                  </td>
+                  <td class="cell-bar">
+                    <div class="bar bar-red" style="width:100%"></div>
+                  </td>
+                  <td class="cell-bar">
+                    <div class="bar bar-red" style="width:40%"></div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="row-label">🚀 F5 — Go-Live DR Cross-Cloud</td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar"></td>
+                  <td class="cell-bar" style="text-align:center;"><span
+                      style="background:var(--green);color:#fff;padding:2px 8px;border-radius:6px;font-weight:800;font-size:11px;">Jan/27</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--sky);"></div>
+            <div class="tl-phase" style="color:var(--sky);">Fase 1</div>
+            <div class="tl-title">Assessment & Triage — Mapeamento do Ecossistema AWS</div>
+            <div class="tl-period">📅 Meses 1–1.5 (Abril → meados de Maio 2026) | Duração: ~6 semanas</div>
+            <div class="tl-body">
+              <p style="margin-bottom:10px;">Levantamento acelerado do portfólio de Lambdas, mapeamento de dependências
+                de serviços nativos (S3, SQS, SNS, EventBridge), classificação por criticidade de negócio e atribuição
+                de RTO/RPO por função.</p>
+              <div class="grid-2">
+                <div>
+                  <strong style="font-size:13px; color:var(--navy);">Entregáveis:</strong>
+                  <ul class="checklist" style="margin-top:6px;">
+                    <li>Inventário de Lambdas com criticidade (Tier 1/2/3)</li>
+                    <li>Mapa de dependências de serviços nativos AWS</li>
+                    <li>RTO/RPO definido por função e por domínio</li>
+                    <li>Análise de acoplamento e candidatos a abstração</li>
+                    <li>Levantamento do custo atual AWS (baseline TCO)</li>
+                  </ul>
+                </div>
+                <div>
+                  <strong style="font-size:13px; color:var(--navy);">Critérios RTO/RPO sugeridos:</strong>
+                  <table style="width:100%;font-size:12px;margin-top:6px;border-collapse:collapse;">
+                    <tr style="background:#F0F4FA;">
+                      <th style="padding:5px 8px;text-align:left;">Tier</th>
+                      <th style="padding:5px 8px;">RTO</th>
+                      <th style="padding:5px 8px;">RPO</th>
+                      <th style="padding:5px 8px;">Estratégia</th>
+                    </tr>
+                    <tr>
+                      <td style="padding:5px 8px;font-weight:700;">1 — Crítico</td>
+                      <td style="padding:5px 8px;text-align:center;"><span class="tag tag-red">≤ 15 min</span></td>
+                      <td style="padding:5px 8px;text-align:center;"><span class="tag tag-red">≤ 5 min</span></td>
+                      <td style="padding:5px 8px;">Warm Standby Ativo</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:5px 8px;font-weight:700;">2 — Alto</td>
+                      <td style="padding:5px 8px;text-align:center;"><span class="tag tag-orange">≤ 1h</span></td>
+                      <td style="padding:5px 8px;text-align:center;"><span class="tag tag-orange">≤ 15 min</span></td>
+                      <td style="padding:5px 8px;">Pilot Light</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:5px 8px;font-weight:700;">3 — Suporte</td>
+                      <td style="padding:5px 8px;text-align:center;"><span class="tag tag-green">≤ 4h</span></td>
+                      <td style="padding:5px 8px;text-align:center;"><span class="tag tag-green">≤ 1h</span></td>
+                      <td style="padding:5px 8px;">Backup & Restore</td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="tl-tags">
+              <span class="tag tag-blue">Arquitetura</span>
+              <span class="tag tag-gray">Sustentação</span>
+              <span class="tag tag-gray">Sem impacto em Produção</span>
+            </div>
+          </div>
+
+          <div class="milestone-card">
+            <div class="milestone-icon">🎯</div>
+            <div>
+              <h3>MILESTONE EXECUTIVO — O PITCH: Mês 2 (Maio 2026)</h3>
+              <p>Este é o momento de Go/No-Go com C-Level e Diretoria. O Assessment das primeiras 6 semanas alimenta
+                diretamente o Business Case com dados reais de inventário, TCO atual, RTO/RPO calibrado e estimativa de
+                CapEx/OpEx da "Cloud B". O Pitch deve ocorrer antes da abertura de RFQ para garantir mandato e budget
+                aprovado antes de negociar com os vendors. <strong>Sem aprovação aqui, nenhum custo de negociação ou PoC
+                  é incorrido.</strong></p>
+            </div>
+          </div>
+
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--accent);"></div>
+            <div class="tl-phase" style="color:var(--accent);">Fase 2</div>
+            <div class="tl-title">Orçamentação, RFQ & Provas de Conceito (PoCs)</div>
+            <div class="tl-period">📅 Meses 2–4.5 (Maio → meados de Agosto 2026) | Duração: ~2.5 meses</div>
+            <div class="tl-body">
+              <p style="margin-bottom:10px;">Abertura simultânea de RFQ para GCP, Azure e OCI. Negociação de Enterprise
+                Agreements (EAs), créditos de migração e execução de PoCs técnicas com as funções Tier 1 mapeadas.
+                Decisão de "Cloud B" ao fim desta fase.</p>
+              <div class="grid-2">
+                <div>
+                  <strong style="font-size:13px; color:var(--navy);">Subetapas (aceleradas):</strong>
+                  <ul class="checklist" style="margin-top:6px;">
+                    <li><strong>Mês 2:</strong> Emissão de RFQ e início de negociações EA</li>
+                    <li><strong>Mês 3:</strong> PoC técnica com Tier 1 em cada vendor (~2 semanas por vendor)</li>
+                    <li><strong>Mês 4:</strong> Negociação de créditos e SLAs contratuais</li>
+                    <li><strong>Mês 4.5:</strong> Avaliação comparativa + decisão final de "Cloud B"</li>
+                  </ul>
+                </div>
+                <div>
+                  <div class="callout warn">
+                    <p><strong>⚠️ Dica de negociação:</strong> Acione GCP, Azure e OCI <strong>simultaneamente</strong>.
+                      O tensionamento competitivo é a principal alavanca para obter créditos de migração (típico: USD
+                      50K–500K), descontos em Committed Use Contracts e SLAs customizados. Nunca sinalize preferência
+                      antes da decisão final.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="tl-tags">
+              <span class="tag tag-orange">FinOps</span>
+              <span class="tag tag-blue">Arquitetura</span>
+              <span class="tag tag-purple">Jurídico/Contratos</span>
+              <span class="tag tag-orange">Aprovação Diretoria</span>
+            </div>
+          </div>
+
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--purple);"></div>
+            <div class="tl-phase" style="color:var(--purple);">Fase 3</div>
+            <div class="tl-title">Engenharia — Decoupling, Abstração & Containerização</div>
+            <div class="tl-period">📅 Meses 3–8 (Junho → Novembro 2026) | Duração: ~6 meses</div>
+            <div class="tl-body">
+              <p style="margin-bottom:10px;">Fase de maior risco técnico. Refatoração progressiva das Lambdas para
+                desacoplar dependências de serviços nativos AWS, substituição por abstrações portáveis e, quando
+                aplicável, containerização (Docker/Kubernetes) para funções que não possuem equivalente FaaS no vendor
+                B.</p>
+              <div class="grid-2">
+                <div>
+                  <strong style="font-size:13px; color:var(--navy);">Estratégia de Abstração por Serviço:</strong>
+                  <table style="width:100%;font-size:12px;margin-top:6px;border-collapse:collapse;">
+                    <tr style="background:#F0F4FA;">
+                      <th style="padding:5px 8px;text-align:left;">AWS Nativo</th>
+                      <th style="padding:5px 8px;text-align:left;">Abstração Portável</th>
+                    </tr>
+                    <tr>
+                      <td style="padding:5px 8px;">EventBridge</td>
+                      <td style="padding:5px 8px;">CloudEvents SDK + Pub/Sub adapter</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:5px 8px;">SQS / SNS</td>
+                      <td style="padding:5px 8px;">Apache Kafka / Confluent Cloud</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:5px 8px;">S3</td>
+                      <td style="padding:5px 8px;">MinIO / SDK abstrato (S3-compatible)</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:5px 8px;">Lambda triggers</td>
+                      <td style="padding:5px 8px;">KEDA + container ou FaaS adapter</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:5px 8px;">CloudWatch</td>
+                      <td style="padding:5px 8px;">Datadog / Grafana + OpenTelemetry</td>
+                    </tr>
+                  </table>
+                </div>
+                <div>
+                  <strong style="font-size:13px; color:var(--navy);">Frentes Paralelas (Início no Mês 4):</strong>
+                  <ul class="checklist" style="margin-top:6px;">
+                    <li><strong>IaC Terraform Multi-Cloud:</strong> Módulos Cloud B provisionados em paralelo à
+                      refatoração</li>
+                    <li><strong>Observabilidade Unificada:</strong> Datadog/Grafana como camada única, substituindo
+                      CloudWatch progressivamente</li>
+                    <li><strong>Pipeline CI/CD Multi-target:</strong> GitHub Actions / ArgoCD com deploy para AWS +
+                      Cloud B</li>
+                    <li><strong>Segurança & IAM Cross-Cloud:</strong> HashiCorp Vault + Federated Identity</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="callout" style="margin-top:14px;">
+                <p><strong>🔀 Paralelismo estratégico:</strong> Os módulos Terraform, configuração de rede
+                  (VPN/Interconnect), IAM federado e a camada de observabilidade unificada <strong>devem ser iniciados
+                    no Mês 4</strong>, imediatamente após a decisão de "Cloud B", sem aguardar a conclusão da
+                  refatoração do código. Isso reduz o caminho crítico significativamente.</p>
+              </div>
+            </div>
+            <div class="tl-tags">
+              <span class="tag tag-purple">Infraestrutura</span>
+              <span class="tag tag-blue">Arquitetura</span>
+              <span class="tag tag-green">Segurança</span>
+              <span class="tag tag-gray">Maior risco técnico</span>
+            </div>
+          </div>
+
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--red);"></div>
+            <div class="tl-phase" style="color:var(--red);">Fase 4</div>
+            <div class="tl-title">Staging, Validação & Chaos Engineering</div>
+            <div class="tl-period">📅 Meses 7–9 (Outubro → Dezembro 2026) | Duração: ~3 meses</div>
+            <div class="tl-body">
+              <p style="margin-bottom:10px;">Ambiente de staging multi-cloud completo espelhando produção. Ciclos de
+                Chaos Engineering para validar RTO/RPO reais, runbooks de failover e treinamento de equipes
+                operacionais.</p>
+              <div class="grid-2">
+                <div>
+                  <strong style="font-size:13px; color:var(--navy);">Janelas de Chaos Engineering:</strong>
+                  <ul class="checklist" style="margin-top:6px;">
+                    <li>Simulação de Regional Outage AWS completo</li>
+                    <li>Injeção de falhas em SQS/SNS (perda de mensagens)</li>
+                    <li>Failover de banco de dados cross-region</li>
+                    <li>Validação de latência de replicação S3</li>
+                    <li>Drill completo de failover com medir RTO real</li>
+                    <li>Rollback test (retorno AWS após failover)</li>
+                  </ul>
+                </div>
+                <div>
+                  <strong style="font-size:13px; color:var(--navy);">Gate de aprovação para Go-Live:</strong>
+                  <ul class="checklist" style="margin-top:6px;">
+                    <li>RTO Tier 1 validado ≤ 15 min em drill</li>
+                    <li>RPO Tier 1 validado ≤ 5 min</li>
+                    <li>Runbooks aprovados por Sustentação e Negócio</li>
+                    <li>Observabilidade unificada funcional 100%</li>
+                    <li>On-call DR treinado e certificado</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="tl-tags">
+              <span class="tag tag-red">Sustentação</span>
+              <span class="tag tag-blue">Arquitetura</span>
+              <span class="tag tag-orange">Negócio (aprovação)</span>
+            </div>
+          </div>
+
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--green);"></div>
+            <div class="tl-phase" style="color:var(--green);">Fase 5</div>
+            <div class="tl-title">🚀 Go-Live DR Cross-Cloud — Ativação em Produção</div>
+            <div class="tl-period">📅 Mês 9 (Janeiro 2027) | Go-Live Final</div>
+            <div class="tl-body">
+              <p>Ativação do ambiente DR em modo Ativo-Passivo (Warm Standby) em Produção. Monitoramento intensificado
+                nas primeiras 4 semanas com equipe de plantão dedicada. Relatório executivo de encerramento com métricas
+                reais de RTO/RPO e TCO atualizado.</p>
+            </div>
+            <div class="tl-tags">
+              <span class="tag tag-green">✅ Go-Live</span>
+              <span class="tag tag-blue">All Teams</span>
+              <span class="tag tag-orange">Executive Report</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <div class="section-num">2</div>
+          <h2>Análise Comparativa & Orçamentária para RFQ</h2>
+          <span class="section-tag">AWS vs. Azure vs. GCP vs. OCI</span>
+        </div>
+
+        <div class="callout" style="margin-bottom:20px;">
+          <p><strong>📋 Fontes Oficiais Verificadas (2025–2026):</strong> Todos os dados desta matriz foram extraídos
+            das documentações oficiais de cada cloud. AWS Lambda Always Free: 1M requests + 400k GB-seconds/mês; GCP
+            Cloud Functions free tier: 2M requests/mês; Azure Functions Consumption: first 1M executions + 400k GB-s
+            free/mês; OCI Functions Always Free: 2M requests + 2M OCPU-s/mês; GCS S3 interoperability via XML API + HMAC
+            authentication; OCI Object Storage native S3-compatible; GCP egress pricing Premium Tier ~$0.12/GB beyond
+            free 1 GiB/month; OCI egress 10 TB/month free; GCP São Paulo region southamerica-east1 operacional; Azure
+            Event Grid 100k operations/mês free; KEDA integrado com GKE/AKS; CloudEvents open specification; Workload
+            Identity Federation cross-cloud.</p>
+        </div>
+
+        <div class="table-wrap">
+          <table>
             <thead>
               <tr>
-                <th style="text-align:left; min-width:180px;">Frente / Fase</th>
-                <th>Abr 26</th>
-                <th>Mai 26</th>
-                <th>Jun 26</th>
-                <th>Jul 26</th>
-                <th>Ago 26</th>
-                <th>Set 26</th>
-                <th>Out 26</th>
-                <th>Nov 26</th>
-                <th>Dez 26</th>
-                <th>Jan 27</th>
+                <th>Critério</th>
+                <th>AWS (baseline)</th>
+                <th>Google Cloud (GCP)</th>
+                <th>Microsoft Azure</th>
+                <th>Oracle Cloud (OCI)</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td class="row-label">F1 — Assessment & Triage</td>
-                <td class="cell-bar"><div class="bar bar-blue" style="width:100%"></div></td>
-                <td class="cell-bar"><div class="bar bar-blue" style="width:60%"></div></td>
-                <td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td>
+                <td class="td-label">FaaS & Event-Driven Ecosystem</td>
+                <td><span class="score score-5">5</span> Lambda nativo, referência do mercado</td>
+                <td><span class="score score-5">5</span> Cloud Functions v2 + Eventarc + Pub/Sub — alta compatibilidade
+                  conceptual com EventBridge</td>
+                <td><span class="score score-4">4</span> Azure Functions + Event Grid + Service Bus — bom, mas
+                  verbosidade de config maior</td>
+                <td><span class="score score-3">3</span> OCI Functions (Fn Project) menos maduro; Events Service com
+                  menor ecossistema</td>
               </tr>
               <tr>
-                <td class="row-label">🎯 PITCH EXECUTIVO (Go/No-Go)</td>
-                <td class="cell-bar"></td>
-                <td class="cell-bar" style="text-align:center;"><span style="background:var(--accent);color:var(--navy);padding:2px 8px;border-radius:6px;font-weight:800;font-size:11px;">MÊS 2</span></td>
-                <td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td>
+                <td class="td-label">Compatibilidade S3 / Object Storage</td>
+                <td><span class="score score-5">5</span> S3 nativo</td>
+                <td><span class="score score-5">5</span> GCS — S3-compatible API via interoperability layer (HMAC)</td>
+                <td><span class="score score-4">4</span> Azure Blob Storage — SDK separado, adapters disponíveis</td>
+                <td><span class="score score-5">5</span> OCI Object Storage — S3-compatible nativo, sem adapter</td>
               </tr>
               <tr>
-                <td class="row-label">F2 — RFQ & PoC Cloud B</td>
-                <td class="cell-bar"></td>
-                <td class="cell-bar"><div class="bar bar-orange" style="width:40%"></div></td>
-                <td class="cell-bar"><div class="bar bar-orange" style="width:100%"></div></td>
-                <td class="cell-bar"><div class="bar bar-orange" style="width:100%"></div></td>
-                <td class="cell-bar"><div class="bar bar-orange" style="width:50%"></div></td>
-                <td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td>
+                <td class="td-label">Custo de Standby / Idle (Warm)</td>
+                <td>N/A (baseline)</td>
+                <td><span class="score score-4">4</span> Cloud Functions: pay-per-invocation; Cloud Run standby viável.
+                  GCS sem custo idle. Pub/Sub: custo baixo em baixo volume</td>
+                <td><span class="score score-3">3</span> Consumption plan bom, mas Premium Plan (EP1 ~$130-150/mês)
+                  caro. Event Grid custo fixo + por evento</td>
+                <td><span class="score score-5">5</span> Always Free tier generoso. OCI Functions: primeira 2M
+                  invocações/mês grátis. Standby lowest-cost do mercado</td>
               </tr>
               <tr>
-                <td class="row-label">F3 — Engenharia / Decoupling</td>
-                <td class="cell-bar"></td><td class="cell-bar"></td>
-                <td class="cell-bar"><div class="bar bar-purple" style="width:50%"></div></td>
-                <td class="cell-bar"><div class="bar bar-purple" style="width:100%"></div></td>
-                <td class="cell-bar"><div class="bar bar-purple" style="width:100%"></div></td>
-                <td class="cell-bar"><div class="bar bar-purple" style="width:100%"></div></td>
-                <td class="cell-bar"><div class="bar bar-purple" style="width:100%"></div></td>
-                <td class="cell-bar"><div class="bar bar-purple" style="width:50%"></div></td>
-                <td class="cell-bar"></td><td class="cell-bar"></td>
+                <td class="td-label">Custo de Egress de Dados</td>
+                <td>Caro (USD 0,09/GB+)</td>
+                <td><span class="score score-4">4</span> Premium Tier ~$0.12/GB; free tier 1 GiB/mês apenas. Desconto
+                  significativo em CUC</td>
+                <td><span class="score score-3">3</span> USD 0,087–0,05/GB com EA. Complexidade de cálculo de saída por
+                  zona</td>
+                <td><span class="score score-5">5</span> <strong>10 TB/mês grátis</strong> para egress à Internet.
+                  Política mais vantajosa do mercado. Ideal para replicação contínua</td>
               </tr>
               <tr>
-                <td class="row-label">║ IaC / Terraform (paralelo)</td>
-                <td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td>
-                <td class="cell-bar"><div class="bar bar-gray" style="width:100%"></div></td>
-                <td class="cell-bar"><div class="bar bar-gray" style="width:100%"></div></td>
-                <td class="cell-bar"><div class="bar bar-gray" style="width:100%"></div></td>
-                <td class="cell-bar"><div class="bar bar-gray" style="width:100%"></div></td>
-                <td class="cell-bar"><div class="bar bar-gray" style="width:100%"></div></td>
-                <td class="cell-bar"><div class="bar bar-gray" style="width:50%"></div></td>
-                <td class="cell-bar"></td>
+                <td class="td-label">Maturidade de Observabilidade</td>
+                <td>CloudWatch (nativo)</td>
+                <td><span class="score score-5">5</span> Cloud Operations (ex-Stackdriver). Integração OpenTelemetry
+                  nativa. Datadog parceiro Premier</td>
+                <td><span class="score score-5">5</span> Azure Monitor + Log Analytics. Grafana nativo. Integração
+                  Datadog bem documentada</td>
+                <td><span class="score score-3">3</span> OCI Monitoring básico. Dependência maior de Datadog/Grafana
+                  externo</td>
               </tr>
               <tr>
-                <td class="row-label">║ Observabilidade Unificada</td>
-                <td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td>
-                <td class="cell-bar"><div class="bar bar-gray" style="width:100%"></div></td>
-                <td class="cell-bar"><div class="bar bar-gray" style="width:100%"></div></td>
-                <td class="cell-bar"><div class="bar bar-gray" style="width:100%"></div></td>
-                <td class="cell-bar"><div class="bar bar-gray" style="width:100%"></div></td>
-                <td class="cell-bar"><div class="bar bar-gray" style="width:50%"></div></td>
-                <td class="cell-bar"></td>
+                <td class="td-label">Agressividade Comercial vs. AWS</td>
+                <td>N/A</td>
+                <td><span class="score score-5">5</span> <strong>Mais agressivo:</strong> Google Migration Credit
+                  Program (até 100% dos custos da PoC), WAGL (Work-At-Google-Level) com SA dedicado. Melhor programa de
+                  conversão de workloads AWS</td>
+                <td><span class="score score-4">4</span> Azure Hybrid Benefit, MOSA (créditos de migração), parceria
+                  Microsoft-Databricks beneficia stacks analytics</td>
+                <td><span class="score score-4">4</span> OCI Universal Credits agressivos, Bring Your Own License (BYOL)
+                  robusto. MIGRATELAB com engenheiro dedicado</td>
               </tr>
               <tr>
-                <td class="row-label">F4 — Staging & Chaos Eng.</td>
-                <td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td>
-                <td class="cell-bar"><div class="bar bar-red" style="width:30%"></div></td>
-                <td class="cell-bar"><div class="bar bar-red" style="width:100%"></div></td>
-                <td class="cell-bar"><div class="bar bar-red" style="width:100%"></div></td>
-                <td class="cell-bar"><div class="bar bar-red" style="width:40%"></div></td>
+                <td class="td-label">Suporte Multi-Region / Latência Brasil</td>
+                <td>São Paulo (sa-east-1)</td>
+                <td><span class="score score-4">4</span> São Paulo (southamerica-east1). Expansão de regiões em
+                  andamento</td>
+                <td><span class="score score-5">5</span> Brazil South (São Paulo) + Brazil Southeast. Melhor cobertura
+                  regional no Brasil</td>
+                <td><span class="score score-3">3</span> Sem região no Brasil (2026). Latência para US-East ou Chile
+                  (~90–120ms)</td>
               </tr>
               <tr>
-                <td class="row-label">🚀 F5 — Go-Live DR Cross-Cloud</td>
-                <td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td><td class="cell-bar"></td>
-                <td class="cell-bar" style="text-align:center;"><span style="background:var(--green);color:#fff;padding:2px 8px;border-radius:6px;font-weight:800;font-size:11px;">Jan/27</span></td>
+                <td class="td-label">Maturidade Kubernetes / KEDA (para containerização)</td>
+                <td>EKS maduro</td>
+                <td><span class="score score-5">5</span> GKE — mais maduro do mercado, KEDA integrado, Autopilot reduz
+                  overhead ops</td>
+                <td><span class="score score-5">5</span> AKS sólido. KEDA originado na Microsoft. Excelente integração
+                  Event Grid + KEDA</td>
+                <td><span class="score score-3">3</span> OKE funcional mas menos recursos de ecosystem operator</td>
+              </tr>
+              <tr>
+                <td class="td-label"><strong>SCORE TOTAL (max 40)</strong></td>
+                <td><strong>—</strong></td>
+                <td><strong style="color:var(--green);">37/40 <span class="winner-badge">Recomendado</span></strong>
+                </td>
+                <td><strong>33/40</strong></td>
+                <td><strong>31/40</strong></td>
               </tr>
             </tbody>
           </table>
         </div>
-      </div>
 
-      <div class="timeline">
-        <div class="tl-item">
-          <div class="tl-dot" style="background:var(--sky);"></div>
-          <div class="tl-phase" style="color:var(--sky);">Fase 1</div>
-          <div class="tl-title">Assessment & Triage — Mapeamento do Ecossistema AWS</div>
-          <div class="tl-period">📅 Meses 1–1.5 (Abril → meados de Maio 2026) | Duração: ~6 semanas</div>
-          <div class="tl-body">
-            <p style="margin-bottom:10px;">Levantamento acelerado do portfólio de Lambdas, mapeamento de dependências de serviços nativos (S3, SQS, SNS, EventBridge), classificação por criticidade de negócio e atribuição de RTO/RPO por função.</p>
-            <div class="grid-2">
-              <div>
-                <strong style="font-size:13px; color:var(--navy);">Entregáveis:</strong>
-                <ul class="checklist" style="margin-top:6px;">
-                  <li>Inventário de Lambdas com criticidade (Tier 1/2/3)</li>
-                  <li>Mapa de dependências de serviços nativos AWS</li>
-                  <li>RTO/RPO definido por função e por domínio</li>
-                  <li>Análise de acoplamento e candidatos a abstração</li>
-                  <li>Levantamento do custo atual AWS (baseline TCO)</li>
-                </ul>
-              </div>
-              <div>
-                <strong style="font-size:13px; color:var(--navy);">Critérios RTO/RPO sugeridos:</strong>
-                <table style="width:100%;font-size:12px;margin-top:6px;border-collapse:collapse;">
-                  <tr style="background:#F0F4FA;"><th style="padding:5px 8px;text-align:left;">Tier</th><th style="padding:5px 8px;">RTO</th><th style="padding:5px 8px;">RPO</th><th style="padding:5px 8px;">Estratégia</th></tr>
-                  <tr><td style="padding:5px 8px;font-weight:700;">1 — Crítico</td><td style="padding:5px 8px;text-align:center;"><span class="tag tag-red">≤ 15 min</span></td><td style="padding:5px 8px;text-align:center;"><span class="tag tag-red">≤ 5 min</span></td><td style="padding:5px 8px;">Warm Standby Ativo</td></tr>
-                  <tr><td style="padding:5px 8px;font-weight:700;">2 — Alto</td><td style="padding:5px 8px;text-align:center;"><span class="tag tag-orange">≤ 1h</span></td><td style="padding:5px 8px;text-align:center;"><span class="tag tag-orange">≤ 15 min</span></td><td style="padding:5px 8px;">Pilot Light</td></tr>
-                  <tr><td style="padding:5px 8px;font-weight:700;">3 — Suporte</td><td style="padding:5px 8px;text-align:center;"><span class="tag tag-green">≤ 4h</span></td><td style="padding:5px 8px;text-align:center;"><span class="tag tag-green">≤ 1h</span></td><td style="padding:5px 8px;">Backup & Restore</td></tr>
-                </table>
-              </div>
-            </div>
-          </div>
-          <div class="tl-tags">
-            <span class="tag tag-blue">Arquitetura</span>
-            <span class="tag tag-gray">Sustentação</span>
-            <span class="tag tag-gray">Sem impacto em Produção</span>
-          </div>
-        </div>
-
-        <div class="milestone-card">
-          <div class="milestone-icon">🎯</div>
+        <div class="pitch-card" style="margin-top:24px;">
+          <div class="pitch-icon">🏆</div>
           <div>
-            <h3>MILESTONE EXECUTIVO — O PITCH: Mês 2 (Maio 2026)</h3>
-            <p>Este é o momento de Go/No-Go com C-Level e Diretoria. O Assessment das primeiras 6 semanas alimenta diretamente o Business Case com dados reais de inventário, TCO atual, RTO/RPO calibrado e estimativa de CapEx/OpEx da "Cloud B". O Pitch deve ocorrer antes da abertura de RFQ para garantir mandato e budget aprovado antes de negociar com os vendors. <strong>Sem aprovação aqui, nenhum custo de negociação ou PoC é incorrido.</strong></p>
+            <h3>Recomendação: GCP como "Cloud B" — Com OCI como alavanca de negociação</h3>
+            <p>GCP apresenta a melhor combinação de compatibilidade técnica com ecossistema event-driven, presença em
+              São Paulo, maturidade FaaS e o programa comercial mais agressivo para conversão de workloads AWS. OCI deve
+              permanecer na mesa durante toda a fase de RFQ como alavanca de negociação — sua política de egress
+              gratuito força GCP e Azure a melhorarem suas propostas comerciais.</p>
+            <ul class="pitch-bullets">
+              <li>GCP Cloud Functions v2 + Pub/Sub substitui Lambda + EventBridge com baixo esforço de abstração</li>
+              <li>GKE + KEDA viabiliza containerização de Lambdas sem equivalente FaaS nativo no vendor B</li>
+              <li>Google Migration Credits (até USD 300K+ em workloads elegíveis) reduzem TCO de transição</li>
+              <li>Eventarc + CloudEvents é o substituto mais próximo conceptualmente do EventBridge</li>
+              <li>Se Latência Brasil for prioridade absoluta: Azure Brazil South como alternativa — único com região
+                local</li>
+            </ul>
           </div>
         </div>
+      </div>
 
-        <div class="tl-item">
-          <div class="tl-dot" style="background:var(--accent);"></div>
-          <div class="tl-phase" style="color:var(--accent);">Fase 2</div>
-          <div class="tl-title">Orçamentação, RFQ & Provas de Conceito (PoCs)</div>
-          <div class="tl-period">📅 Meses 2–4.5 (Maio → meados de Agosto 2026) | Duração: ~2.5 meses</div>
-          <div class="tl-body">
-            <p style="margin-bottom:10px;">Abertura simultânea de RFQ para GCP, Azure e OCI. Negociação de Enterprise Agreements (EAs), créditos de migração e execução de PoCs técnicas com as funções Tier 1 mapeadas. Decisão de "Cloud B" ao fim desta fase.</p>
-            <div class="grid-2">
-              <div>
-                <strong style="font-size:13px; color:var(--navy);">Subetapas (aceleradas):</strong>
-                <ul class="checklist" style="margin-top:6px;">
-                  <li><strong>Mês 2:</strong> Emissão de RFQ e início de negociações EA</li>
-                  <li><strong>Mês 3:</strong> PoC técnica com Tier 1 em cada vendor (~2 semanas por vendor)</li>
-                  <li><strong>Mês 4:</strong> Negociação de créditos e SLAs contratuais</li>
-                  <li><strong>Mês 4.5:</strong> Avaliação comparativa + decisão final de "Cloud B"</li>
-                </ul>
-              </div>
-              <div>
-                <div class="callout warn">
-                  <p><strong>⚠️ Dica de negociação:</strong> Acione GCP, Azure e OCI <strong>simultaneamente</strong>. O tensionamento competitivo é a principal alavanca para obter créditos de migração (típico: USD 50K–500K), descontos em Committed Use Contracts e SLAs customizados. Nunca sinalize preferência antes da decisão final.</p>
-                </div>
-              </div>
+      <div class="section">
+        <div class="section-header">
+          <div class="section-num">3</div>
+          <h2>Framework de Defesa & Business Case Executivo</h2>
+          <span class="section-tag">O Pitch — C-Level / Diretoria</span>
+        </div>
+
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-title"><span class="dot" style="background:var(--accent)"></span>Estrutura do Pitch — Mês 2
+            (Maio 2026)</div>
+          <p style="font-size:13.5px; color:#3A4560; margin-bottom:16px;">O Business Case deve ser construído em três
+            camadas argumentativas: Risco Atual (o custo da inação), Custo da Solução (TCO justificado) e Vantagem
+            Competitiva (ROI estratégico).</p>
+          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:16px;">
+            <div style="background:#FFF5F5; border-radius:10px; padding:16px; border:1px solid #F5C6C6;">
+              <div style="font-size:22px; margin-bottom:8px;">🔥</div>
+              <div style="font-weight:800; font-size:14px; color:var(--red); margin-bottom:6px;">Camada 1: Risco da
+                Inação</div>
+              <p style="font-size:12.5px; color:#5A2020;">Quantifique o custo de uma interrupção regional AWS. "Se
+                sa-east-1 cair por 4h, qual é o revenue loss?" Isso ancora a conversa em números de negócio, não em
+                tecnologia.</p>
+            </div>
+            <div style="background:#F0F8FF; border-radius:10px; padding:16px; border:1px solid #B8D9F5;">
+              <div style="font-size:22px; margin-bottom:8px;">💰</div>
+              <div style="font-weight:800; font-size:14px; color:var(--blue); margin-bottom:6px;">Camada 2: TCO da
+                Solução</div>
+              <p style="font-size:12.5px; color:#1A3A5A;">TCO do DR Cross-Cloud típico = 15–25% do custo produção AWS em
+                standby (warm). Mostre que é seguro de negócio, não apenas custo de TI.</p>
+            </div>
+            <div style="background:#F0FFF8; border-radius:10px; padding:16px; border:1px solid #9FE0C4;">
+              <div style="font-size:22px; margin-bottom:8px;">📈</div>
+              <div style="font-weight:800; font-size:14px; color:var(--green); margin-bottom:6px;">Camada 3: ROI
+                Estratégico</div>
+              <p style="font-size:12.5px; color:#0A3A25;">Multi-cloud habilita alavancagem comercial permanente:
+                renewals AWS sempre com alternativa real na mesa. Estimativa: 10–20% de desconto no próximo EA AWS.</p>
             </div>
           </div>
-          <div class="tl-tags">
-            <span class="tag tag-orange">FinOps</span>
-            <span class="tag tag-blue">Arquitetura</span>
-            <span class="tag tag-purple">Jurídico/Contratos</span>
-            <span class="tag tag-orange">Aprovação Diretoria</span>
-          </div>
         </div>
 
-        <div class="tl-item">
-          <div class="tl-dot" style="background:var(--purple);"></div>
-          <div class="tl-phase" style="color:var(--purple);">Fase 3</div>
-          <div class="tl-title">Engenharia — Decoupling, Abstração & Containerização</div>
-          <div class="tl-period">📅 Meses 3–8 (Junho → Novembro 2026) | Duração: ~6 meses</div>
-          <div class="tl-body">
-            <p style="margin-bottom:10px;">Fase de maior risco técnico. Refatoração progressiva das Lambdas para desacoplar dependências de serviços nativos AWS, substituição por abstrações portáveis e, quando aplicável, containerização (Docker/Kubernetes) para funções que não possuem equivalente FaaS no vendor B.</p>
-            <div class="grid-2">
-              <div>
-                <strong style="font-size:13px; color:var(--navy);">Estratégia de Abstração por Serviço:</strong>
-                <table style="width:100%;font-size:12px;margin-top:6px;border-collapse:collapse;">
-                  <tr style="background:#F0F4FA;"><th style="padding:5px 8px;text-align:left;">AWS Nativo</th><th style="padding:5px 8px;text-align:left;">Abstração Portável</th></tr>
-                  <tr><td style="padding:5px 8px;">EventBridge</td><td style="padding:5px 8px;">CloudEvents SDK + Pub/Sub adapter</td></tr>
-                  <tr><td style="padding:5px 8px;">SQS / SNS</td><td style="padding:5px 8px;">Apache Kafka / Confluent Cloud</td></tr>
-                  <tr><td style="padding:5px 8px;">S3</td><td style="padding:5px 8px;">MinIO / SDK abstrato (S3-compatible)</td></tr>
-                  <tr><td style="padding:5px 8px;">Lambda triggers</td><td style="padding:5px 8px;">KEDA + container ou FaaS adapter</td></tr>
-                  <tr><td style="padding:5px 8px;">CloudWatch</td><td style="padding:5px 8px;">Datadog / Grafana + OpenTelemetry</td></tr>
-                </table>
-              </div>
-              <div>
-                <strong style="font-size:13px; color:var(--navy);">Frentes Paralelas (Início no Mês 4):</strong>
-                <ul class="checklist" style="margin-top:6px;">
-                  <li><strong>IaC Terraform Multi-Cloud:</strong> Módulos Cloud B provisionados em paralelo à refatoração</li>
-                  <li><strong>Observabilidade Unificada:</strong> Datadog/Grafana como camada única, substituindo CloudWatch progressivamente</li>
-                  <li><strong>Pipeline CI/CD Multi-target:</strong> GitHub Actions / ArgoCD com deploy para AWS + Cloud B</li>
-                  <li><strong>Segurança & IAM Cross-Cloud:</strong> HashiCorp Vault + Federated Identity</li>
-                </ul>
-              </div>
-            </div>
-            <div class="callout" style="margin-top:14px;">
-              <p><strong>🔀 Paralelismo estratégico:</strong> Os módulos Terraform, configuração de rede (VPN/Interconnect), IAM federado e a camada de observabilidade unificada <strong>devem ser iniciados no Mês 4</strong>, imediatamente após a decisão de "Cloud B", sem aguardar a conclusão da refatoração do código. Isso reduz o caminho crítico significativamente.</p>
-            </div>
-          </div>
-          <div class="tl-tags">
-            <span class="tag tag-purple">Infraestrutura</span>
-            <span class="tag tag-blue">Arquitetura</span>
-            <span class="tag tag-green">Segurança</span>
-            <span class="tag tag-gray">Maior risco técnico</span>
-          </div>
+        <div class="arg-card danger">
+          <h4>💀 Argumento 1 — O Custo Real do Vendor Lock-in</h4>
+          <p>Dependência total de um único vendor cria poder de barganha unilateral na hora da renovação do Enterprise
+            Agreement. Com <span class="em">100% do workload em AWS, a empresa não tem alternativa real</span> na mesa
+            de negociação. Estimativas de mercado (Gartner 2024) indicam que organizações com multi-cloud real obtêm
+            12–18% de desconto em renovações de EA comparadas a empresas mono-cloud. Para um spend AWS de USD 2M/ano,
+            isso representa USD 240K–360K de economia anual recorrente — suficiente para financiar parte do OpEx do DR.
+          </p>
         </div>
 
-        <div class="tl-item">
-          <div class="tl-dot" style="background:var(--red);"></div>
-          <div class="tl-phase" style="color:var(--red);">Fase 4</div>
-          <div class="tl-title">Staging, Validação & Chaos Engineering</div>
-          <div class="tl-period">📅 Meses 7–9 (Outubro → Dezembro 2026) | Duração: ~3 meses</div>
-          <div class="tl-body">
-            <p style="margin-bottom:10px;">Ambiente de staging multi-cloud completo espelhando produção. Ciclos de Chaos Engineering para validar RTO/RPO reais, runbooks de failover e treinamento de equipes operacionais.</p>
-            <div class="grid-2">
-              <div>
-                <strong style="font-size:13px; color:var(--navy);">Janelas de Chaos Engineering:</strong>
-                <ul class="checklist" style="margin-top:6px;">
-                  <li>Simulação de Regional Outage AWS completo</li>
-                  <li>Injeção de falhas em SQS/SNS (perda de mensagens)</li>
-                  <li>Failover de banco de dados cross-region</li>
-                  <li>Validação de latência de replicação S3</li>
-                  <li>Drill completo de failover com medir RTO real</li>
-                  <li>Rollback test (retorno AWS após failover)</li>
-                </ul>
-              </div>
-              <div>
-                <strong style="font-size:13px; color:var(--navy);">Gate de aprovação para Go-Live:</strong>
-                <ul class="checklist" style="margin-top:6px;">
-                  <li>RTO Tier 1 validado ≤ 15 min em drill</li>
-                  <li>RPO Tier 1 validado ≤ 5 min</li>
-                  <li>Runbooks aprovados por Sustentação e Negócio</li>
-                  <li>Observabilidade unificada funcional 100%</li>
-                  <li>On-call DR treinado e certificado</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div class="tl-tags">
-            <span class="tag tag-red">Sustentação</span>
-            <span class="tag tag-blue">Arquitetura</span>
-            <span class="tag tag-orange">Negócio (aprovação)</span>
-          </div>
+        <div class="arg-card danger">
+          <h4>🌩️ Argumento 2 — Risco de Indisponibilidade Regional (sa-east-1)</h4>
+          <p>Incidentes históricos documentados: AWS us-east-1 (2021, 2022, 2023 — múltiplos eventos), AWS
+            ap-southeast-1 (2023). <span class="em">Nenhuma region-level é 100% imune a outages multi-AZ</span>. O custo
+            médio de downtime em sistemas de e-commerce/fintech no Brasil é estimado em BRL 50K–500K/hora (variável pelo
+            setor). Um RTO atual de "horas" em cenário de disaster representa risco financeiro e regulatório direto
+            (BACEN, LGPD SLA clauses).</p>
         </div>
 
-        <div class="tl-item">
-          <div class="tl-dot" style="background:var(--green);"></div>
-          <div class="tl-phase" style="color:var(--green);">Fase 5</div>
-          <div class="tl-title">🚀 Go-Live DR Cross-Cloud — Ativação em Produção</div>
-          <div class="tl-period">📅 Mês 9 (Janeiro 2027) | Go-Live Final</div>
-          <div class="tl-body">
-            <p>Ativação do ambiente DR em modo Ativo-Passivo (Warm Standby) em Produção. Monitoramento intensificado nas primeiras 4 semanas com equipe de plantão dedicada. Relatório executivo de encerramento com métricas reais de RTO/RPO e TCO atualizado.</p>
-          </div>
-          <div class="tl-tags">
-            <span class="tag tag-green">✅ Go-Live</span>
-            <span class="tag tag-blue">All Teams</span>
-            <span class="tag tag-orange">Executive Report</span>
-          </div>
+        <div class="arg-card green">
+          <h4>📊 Argumento 3 — TCO Justificado: O Modelo "Seguro de Negócio"</h4>
+          <p>O custo de um ambiente DR Ativo-Passivo (Warm Standby) é tipicamente <span class="em">15–25% do custo do
+              ambiente de produção</span>. Para um spend AWS de USD 100K/mês, o DR Cross-Cloud custa USD 15–25K/mês
+            adicional. Enquadre para o C-Level como um seguro: "Pagamos X% do custo do ambiente para garantir que um
+            evento de probabilidade baixa mas impacto catastrófico não destrua semanas de receita." Nenhuma seguradora
+            justifica prêmio de seguro com base em "probabilidade alta" — mas com base em "impacto catastrófico se
+            ocorrer".</p>
         </div>
-      </div>
-    </div>
 
-    <div class="section">
-      <div class="section-header">
-        <div class="section-num">2</div>
-        <h2>Análise Comparativa & Orçamentária para RFQ</h2>
-        <span class="section-tag">AWS vs. Azure vs. GCP vs. OCI</span>
-      </div>
-
-      <div class="callout" style="margin-bottom:20px;">
-        <p><strong>📋 Fontes Oficiais Verificadas (2025–2026):</strong> Todos os dados desta matriz foram extraídos das documentações oficiais de cada cloud. AWS Lambda Always Free: 1M requests + 400k GB-seconds/mês; GCP Cloud Functions free tier: 2M requests/mês; Azure Functions Consumption: first 1M executions + 400k GB-s free/mês; OCI Functions Always Free: 2M requests + 2M OCPU-s/mês; GCS S3 interoperability via XML API + HMAC authentication; OCI Object Storage native S3-compatible; GCP egress pricing Premium Tier ~$0.12/GB beyond free 1 GiB/month; OCI egress 10 TB/month free; GCP São Paulo region southamerica-east1 operacional; Azure Event Grid 100k operations/mês free; KEDA integrado com GKE/AKS; CloudEvents open specification; Workload Identity Federation cross-cloud.</p>
-      </div>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Critério</th>
-              <th>AWS (baseline)</th>
-              <th>Google Cloud (GCP)</th>
-              <th>Microsoft Azure</th>
-              <th>Oracle Cloud (OCI)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="td-label">FaaS & Event-Driven Ecosystem</td>
-              <td><span class="score score-5">5</span> Lambda nativo, referência do mercado</td>
-              <td><span class="score score-5">5</span> Cloud Functions v2 + Eventarc + Pub/Sub — alta compatibilidade conceptual com EventBridge</td>
-              <td><span class="score score-4">4</span> Azure Functions + Event Grid + Service Bus — bom, mas verbosidade de config maior</td>
-              <td><span class="score score-3">3</span> OCI Functions (Fn Project) menos maduro; Events Service com menor ecossistema</td>
-            </tr>
-            <tr>
-              <td class="td-label">Compatibilidade S3 / Object Storage</td>
-              <td><span class="score score-5">5</span> S3 nativo</td>
-              <td><span class="score score-5">5</span> GCS — S3-compatible API via interoperability layer (HMAC)</td>
-              <td><span class="score score-4">4</span> Azure Blob Storage — SDK separado, adapters disponíveis</td>
-              <td><span class="score score-5">5</span> OCI Object Storage — S3-compatible nativo, sem adapter</td>
-            </tr>
-            <tr>
-              <td class="td-label">Custo de Standby / Idle (Warm)</td>
-              <td>N/A (baseline)</td>
-              <td><span class="score score-4">4</span> Cloud Functions: pay-per-invocation; Cloud Run standby viável. GCS sem custo idle. Pub/Sub: custo baixo em baixo volume</td>
-              <td><span class="score score-3">3</span> Consumption plan bom, mas Premium Plan (EP1 ~$130-150/mês) caro. Event Grid custo fixo + por evento</td>
-              <td><span class="score score-5">5</span> Always Free tier generoso. OCI Functions: primeira 2M invocações/mês grátis. Standby lowest-cost do mercado</td>
-            </tr>
-            <tr>
-              <td class="td-label">Custo de Egress de Dados</td>
-              <td>Caro (USD 0,09/GB+)</td>
-              <td><span class="score score-4">4</span> Premium Tier ~$0.12/GB; free tier 1 GiB/mês apenas. Desconto significativo em CUC</td>
-              <td><span class="score score-3">3</span> USD 0,087–0,05/GB com EA. Complexidade de cálculo de saída por zona</td>
-              <td><span class="score score-5">5</span> <strong>10 TB/mês grátis</strong> para egress à Internet. Política mais vantajosa do mercado. Ideal para replicação contínua</td>
-            </tr>
-            <tr>
-              <td class="td-label">Maturidade de Observabilidade</td>
-              <td>CloudWatch (nativo)</td>
-              <td><span class="score score-5">5</span> Cloud Operations (ex-Stackdriver). Integração OpenTelemetry nativa. Datadog parceiro Premier</td>
-              <td><span class="score score-5">5</span> Azure Monitor + Log Analytics. Grafana nativo. Integração Datadog bem documentada</td>
-              <td><span class="score score-3">3</span> OCI Monitoring básico. Dependência maior de Datadog/Grafana externo</td>
-            </tr>
-            <tr>
-              <td class="td-label">Agressividade Comercial vs. AWS</td>
-              <td>N/A</td>
-              <td><span class="score score-5">5</span> <strong>Mais agressivo:</strong> Google Migration Credit Program (até 100% dos custos da PoC), WAGL (Work-At-Google-Level) com SA dedicado. Melhor programa de conversão de workloads AWS</td>
-              <td><span class="score score-4">4</span> Azure Hybrid Benefit, MOSA (créditos de migração), parceria Microsoft-Databricks beneficia stacks analytics</td>
-              <td><span class="score score-4">4</span> OCI Universal Credits agressivos, Bring Your Own License (BYOL) robusto. MIGRATELAB com engenheiro dedicado</td>
-            </tr>
-            <tr>
-              <td class="td-label">Suporte Multi-Region / Latência Brasil</td>
-              <td>São Paulo (sa-east-1)</td>
-              <td><span class="score score-4">4</span> São Paulo (southamerica-east1). Expansão de regiões em andamento</td>
-              <td><span class="score score-5">5</span> Brazil South (São Paulo) + Brazil Southeast. Melhor cobertura regional no Brasil</td>
-              <td><span class="score score-3">3</span> Sem região no Brasil (2026). Latência para US-East ou Chile (~90–120ms)</td>
-            </tr>
-            <tr>
-              <td class="td-label">Maturidade Kubernetes / KEDA (para containerização)</td>
-              <td>EKS maduro</td>
-              <td><span class="score score-5">5</span> GKE — mais maduro do mercado, KEDA integrado, Autopilot reduz overhead ops</td>
-              <td><span class="score score-5">5</span> AKS sólido. KEDA originado na Microsoft. Excelente integração Event Grid + KEDA</td>
-              <td><span class="score score-3">3</span> OKE funcional mas menos recursos de ecosystem operator</td>
-            </tr>
-            <tr>
-              <td class="td-label"><strong>SCORE TOTAL (max 40)</strong></td>
-              <td><strong>—</strong></td>
-              <td><strong style="color:var(--green);">37/40 <span class="winner-badge">Recomendado</span></strong></td>
-              <td><strong>33/40</strong></td>
-              <td><strong>31/40</strong></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="pitch-card" style="margin-top:24px;">
-        <div class="pitch-icon">🏆</div>
-        <div>
-          <h3>Recomendação: GCP como "Cloud B" — Com OCI como alavanca de negociação</h3>
-          <p>GCP apresenta a melhor combinação de compatibilidade técnica com ecossistema event-driven, presença em São Paulo, maturidade FaaS e o programa comercial mais agressivo para conversão de workloads AWS. OCI deve permanecer na mesa durante toda a fase de RFQ como alavanca de negociação — sua política de egress gratuito força GCP e Azure a melhorarem suas propostas comerciais.</p>
-          <ul class="pitch-bullets">
-            <li>GCP Cloud Functions v2 + Pub/Sub substitui Lambda + EventBridge com baixo esforço de abstração</li>
-            <li>GKE + KEDA viabiliza containerização de Lambdas sem equivalente FaaS nativo no vendor B</li>
-            <li>Google Migration Credits (até USD 300K+ em workloads elegíveis) reduzem TCO de transição</li>
-            <li>Eventarc + CloudEvents é o substituto mais próximo conceptualmente do EventBridge</li>
-            <li>Se Latência Brasil for prioridade absoluta: Azure Brazil South como alternativa — único com região local</li>
-          </ul>
+        <div class="arg-card">
+          <h4>🏛️ Argumento 4 — Compliance, Regulatório e Requisitos de Clientes</h4>
+          <p>Empresas de médio/grande porte B2B são cada vez mais cobradas por seus clientes corporativos a demonstrar
+            planos de DR documentados e testados (SOC 2 Type II, ISO 22301, exigências de due diligence). <span
+              class="em">Um plano de DR multi-cloud testado é um ativo comercial</span> em processos de RFP e renovação
+            de contratos B2B, além de requisito crescente em setores regulados (financeiro, saúde, governo).</p>
         </div>
-      </div>
-    </div>
 
-    <div class="section">
-      <div class="section-header">
-        <div class="section-num">3</div>
-        <h2>Framework de Defesa & Business Case Executivo</h2>
-        <span class="section-tag">O Pitch — C-Level / Diretoria</span>
-      </div>
+        <div class="arg-card purple">
+          <h4>🚀 Argumento 5 — Habilitador de Inovação, não só Contingência</h4>
+          <p>A abstração de serviços realizada durante o projeto (desacoplamento de EventBridge, portabilidade de
+            triggers) gera um <span class="em">dividendo arquitetural permanente</span>: código mais testável, modular e
+            não proprietário. A equipe de engenharia ganha competência multi-cloud, que é um diferencial de recrutamento
+            e retenção de talentos. O projeto financia, em paralelo, a modernização da dívida técnica acumulada em
+            dependências nativas AWS.</p>
+        </div>
 
-      <div class="card" style="margin-bottom:20px;">
-        <div class="card-title"><span class="dot" style="background:var(--accent)"></span>Estrutura do Pitch — Mês 2 (Maio 2026)</div>
-        <p style="font-size:13.5px; color:#3A4560; margin-bottom:16px;">O Business Case deve ser construído em três camadas argumentativas: Risco Atual (o custo da inação), Custo da Solução (TCO justificado) e Vantagem Competitiva (ROI estratégico).</p>
-        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:16px;">
-          <div style="background:#FFF5F5; border-radius:10px; padding:16px; border:1px solid #F5C6C6;">
-            <div style="font-size:22px; margin-bottom:8px;">🔥</div>
-            <div style="font-weight:800; font-size:14px; color:var(--red); margin-bottom:6px;">Camada 1: Risco da Inação</div>
-            <p style="font-size:12.5px; color:#5A2020;">Quantifique o custo de uma interrupção regional AWS. "Se sa-east-1 cair por 4h, qual é o revenue loss?" Isso ancora a conversa em números de negócio, não em tecnologia.</p>
-          </div>
-          <div style="background:#F0F8FF; border-radius:10px; padding:16px; border:1px solid #B8D9F5;">
-            <div style="font-size:22px; margin-bottom:8px;">💰</div>
-            <div style="font-weight:800; font-size:14px; color:var(--blue); margin-bottom:6px;">Camada 2: TCO da Solução</div>
-            <p style="font-size:12.5px; color:#1A3A5A;">TCO do DR Cross-Cloud típico = 15–25% do custo produção AWS em standby (warm). Mostre que é seguro de negócio, não apenas custo de TI.</p>
-          </div>
-          <div style="background:#F0FFF8; border-radius:10px; padding:16px; border:1px solid #9FE0C4;">
-            <div style="font-size:22px; margin-bottom:8px;">📈</div>
-            <div style="font-weight:800; font-size:14px; color:var(--green); margin-bottom:6px;">Camada 3: ROI Estratégico</div>
-            <p style="font-size:12.5px; color:#0A3A25;">Multi-cloud habilita alavancagem comercial permanente: renewals AWS sempre com alternativa real na mesa. Estimativa: 10–20% de desconto no próximo EA AWS.</p>
+        <div class="card" style="margin-top:24px;">
+          <div class="card-title"><span class="dot" style="background:var(--green)"></span>Modelo TCO Simplificado para
+            o Pitch</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Fase (Período)</th>
+                  <th>Custo Estimado (USD)</th>
+                  <th>Observação</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="td-label">Assessment & Arquitetura</td>
+                  <td>Meses 1–1.5</td>
+                  <td>20K–40K</td>
+                  <td>Horas SA interno + consultoria externa se aplicável</td>
+                </tr>
+                <tr>
+                  <td class="td-label">Licenças PoC (GCP/Azure/OCI)</td>
+                  <td>Meses 3–4</td>
+                  <td>10K–30K</td>
+                  <td>Em grande parte cobertos por créditos de migração do vendor</td>
+                </tr>
+                <tr>
+                  <td class="td-label">Engenharia de Refatoração</td>
+                  <td>Meses 3–8</td>
+                  <td>150K–350K</td>
+                  <td>Depende do tamanho do portfólio de Lambdas (principal CAPEX)</td>
+                </tr>
+                <tr>
+                  <td class="td-label">IaC, Observabilidade, CI/CD</td>
+                  <td>Meses 4–8</td>
+                  <td>30K–60K</td>
+                  <td>Ferramental (Datadog/Grafana, Terraform Enterprise)</td>
+                </tr>
+                <tr>
+                  <td class="td-label">Chaos Engineering & Testes</td>
+                  <td>Meses 7–9</td>
+                  <td>15K–30K</td>
+                  <td>Gremlin / AWS FIS / Chaos Toolkit</td>
+                </tr>
+                <tr>
+                  <td class="td-label"><strong>CAPEX Total do Projeto</strong></td>
+                  <td>9 meses</td>
+                  <td><strong>225K–510K</strong></td>
+                  <td>Calibrar com baseline do Assessment</td>
+                </tr>
+                <tr>
+                  <td class="td-label"><strong>OpEx Recorrente (Warm Standby)</strong></td>
+                  <td>Após Go-Live</td>
+                  <td><strong>15–25% do OPEX AWS</strong></td>
+                  <td>Custo mensal da "Cloud B" em standby</td>
+                </tr>
+                <tr>
+                  <td class="td-label" style="color:var(--green);"><strong>Economia EA AWS (estimada)</strong></td>
+                  <td>Próxima renovação</td>
+                  <td><strong>(120K–360K/ano)</strong></td>
+                  <td>Alavancagem multi-cloud em negociação EA</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
 
-      <div class="arg-card danger">
-        <h4>💀 Argumento 1 — O Custo Real do Vendor Lock-in</h4>
-        <p>Dependência total de um único vendor cria poder de barganha unilateral na hora da renovação do Enterprise Agreement. Com <span class="em">100% do workload em AWS, a empresa não tem alternativa real</span> na mesa de negociação. Estimativas de mercado (Gartner 2024) indicam que organizações com multi-cloud real obtêm 12–18% de desconto em renovações de EA comparadas a empresas mono-cloud. Para um spend AWS de USD 2M/ano, isso representa USD 240K–360K de economia anual recorrente — suficiente para financiar parte do OpEx do DR.</p>
-      </div>
+      <div class="section">
+        <div class="section-header">
+          <div class="section-num">4</div>
+          <h2>Matriz RACI do Programa</h2>
+          <span class="section-tag">Arquitetura · Infraestrutura · Sustentação · Diretoria</span>
+        </div>
 
-      <div class="arg-card danger">
-        <h4>🌩️ Argumento 2 — Risco de Indisponibilidade Regional (sa-east-1)</h4>
-        <p>Incidentes históricos documentados: AWS us-east-1 (2021, 2022, 2023 — múltiplos eventos), AWS ap-southeast-1 (2023). <span class="em">Nenhuma region-level é 100% imune a outages multi-AZ</span>. O custo médio de downtime em sistemas de e-commerce/fintech no Brasil é estimado em BRL 50K–500K/hora (variável pelo setor). Um RTO atual de "horas" em cenário de disaster representa risco financeiro e regulatório direto (BACEN, LGPD SLA clauses).</p>
-      </div>
+        <div class="raci-legend">
+          <div class="raci-legend-item">
+            <div class="raci-legend-dot" style="background:var(--red)"></div><strong class="raci-r">R —
+              Responsible:</strong> Executa a atividade
+          </div>
+          <div class="raci-legend-item">
+            <div class="raci-legend-dot" style="background:var(--accent)"></div><strong class="raci-a">A —
+              Accountable:</strong> Dono/aprovador final
+          </div>
+          <div class="raci-legend-item">
+            <div class="raci-legend-dot" style="background:var(--sky)"></div><strong class="raci-c">C —
+              Consulted:</strong> Consultado, input bilateral
+          </div>
+          <div class="raci-legend-item">
+            <div class="raci-legend-dot" style="background:var(--muted)"></div><strong class="raci-i">I —
+              Informed:</strong> Recebe atualização
+          </div>
+        </div>
 
-      <div class="arg-card green">
-        <h4>📊 Argumento 3 — TCO Justificado: O Modelo "Seguro de Negócio"</h4>
-        <p>O custo de um ambiente DR Ativo-Passivo (Warm Standby) é tipicamente <span class="em">15–25% do custo do ambiente de produção</span>. Para um spend AWS de USD 100K/mês, o DR Cross-Cloud custa USD 15–25K/mês adicional. Enquadre para o C-Level como um seguro: "Pagamos X% do custo do ambiente para garantir que um evento de probabilidade baixa mas impacto catastrófico não destrua semanas de receita." Nenhuma seguradora justifica prêmio de seguro com base em "probabilidade alta" — mas com base em "impacto catastrófico se ocorrer".</p>
-      </div>
-
-      <div class="arg-card">
-        <h4>🏛️ Argumento 4 — Compliance, Regulatório e Requisitos de Clientes</h4>
-        <p>Empresas de médio/grande porte B2B são cada vez mais cobradas por seus clientes corporativos a demonstrar planos de DR documentados e testados (SOC 2 Type II, ISO 22301, exigências de due diligence). <span class="em">Um plano de DR multi-cloud testado é um ativo comercial</span> em processos de RFP e renovação de contratos B2B, além de requisito crescente em setores regulados (financeiro, saúde, governo).</p>
-      </div>
-
-      <div class="arg-card purple">
-        <h4>🚀 Argumento 5 — Habilitador de Inovação, não só Contingência</h4>
-        <p>A abstração de serviços realizada durante o projeto (desacoplamento de EventBridge, portabilidade de triggers) gera um <span class="em">dividendo arquitetural permanente</span>: código mais testável, modular e não proprietário. A equipe de engenharia ganha competência multi-cloud, que é um diferencial de recrutamento e retenção de talentos. O projeto financia, em paralelo, a modernização da dívida técnica acumulada em dependências nativas AWS.</p>
-      </div>
-
-      <div class="card" style="margin-top:24px;">
-        <div class="card-title"><span class="dot" style="background:var(--green)"></span>Modelo TCO Simplificado para o Pitch</div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Item</th><th>Fase (Período)</th><th>Custo Estimado (USD)</th><th>Observação</th></tr></thead>
+        <div class="table-wrap" style="margin-top:16px;">
+          <table class="raci-table">
+            <thead>
+              <tr>
+                <th>Atividade / Entregável</th>
+                <th style="min-width:130px;">Arquitetura</th>
+                <th style="min-width:130px;">Infraestrutura</th>
+                <th style="min-width:130px;">Sustentação</th>
+                <th style="min-width:130px;">Diretoria</th>
+              </tr>
+            </thead>
             <tbody>
-              <tr><td class="td-label">Assessment & Arquitetura</td><td>Meses 1–1.5</td><td>20K–40K</td><td>Horas SA interno + consultoria externa se aplicável</td></tr>
-              <tr><td class="td-label">Licenças PoC (GCP/Azure/OCI)</td><td>Meses 3–4</td><td>10K–30K</td><td>Em grande parte cobertos por créditos de migração do vendor</td></tr>
-              <tr><td class="td-label">Engenharia de Refatoração</td><td>Meses 3–8</td><td>150K–350K</td><td>Depende do tamanho do portfólio de Lambdas (principal CAPEX)</td></tr>
-              <tr><td class="td-label">IaC, Observabilidade, CI/CD</td><td>Meses 4–8</td><td>30K–60K</td><td>Ferramental (Datadog/Grafana, Terraform Enterprise)</td></tr>
-              <tr><td class="td-label">Chaos Engineering & Testes</td><td>Meses 7–9</td><td>15K–30K</td><td>Gremlin / AWS FIS / Chaos Toolkit</td></tr>
-              <tr><td class="td-label"><strong>CAPEX Total do Projeto</strong></td><td>9 meses</td><td><strong>225K–510K</strong></td><td>Calibrar com baseline do Assessment</td></tr>
-              <tr><td class="td-label"><strong>OpEx Recorrente (Warm Standby)</strong></td><td>Após Go-Live</td><td><strong>15–25% do OPEX AWS</strong></td><td>Custo mensal da "Cloud B" em standby</td></tr>
-              <tr><td class="td-label" style="color:var(--green);"><strong>Economia EA AWS (estimada)</strong></td><td>Próxima renovação</td><td><strong>(120K–360K/ano)</strong></td><td>Alavancagem multi-cloud em negociação EA</td></tr>
+              <tr>
+                <td colspan="5"
+                  style="background:#F0F4FA; font-weight:800; color:var(--navy); font-size:12px; padding:8px 16px; letter-spacing:0.5px;">
+                  FASE 1 — ASSESSMENT & TRIAGE (Abr–Mai 2026)</td>
+              </tr>
+              <tr>
+                <td class="td-label">Inventário de Lambdas e dependências AWS</td>
+                <td><span class="raci-r">R</span> / <span class="raci-a">A</span></td>
+                <td><span class="raci-c">C</span></td>
+                <td><span class="raci-i">I</span></td>
+                <td><span class="raci-i">I</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Definição de RTO/RPO por tier</td>
+                <td><span class="raci-a">A</span></td>
+                <td><span class="raci-r">R</span></td>
+                <td><span class="raci-c">C</span></td>
+                <td><span class="raci-i">I</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Levantamento de TCO atual AWS (baseline)</td>
+                <td><span class="raci-c">C</span></td>
+                <td><span class="raci-c">C</span></td>
+                <td><span class="raci-r">R</span> / <span class="raci-a">A</span></td>
+                <td><span class="raci-i">I</span></td>
+              </tr>
+
+              <tr>
+                <td colspan="5"
+                  style="background:#FEF9EC; font-weight:800; color:#B8720A; font-size:12px; padding:8px 16px; letter-spacing:0.5px;">
+                  MILESTONE — PITCH EXECUTIVO (Mês 2 — Maio 2026)</td>
+              </tr>
+              <tr>
+                <td class="td-label">Elaboração do Business Case e TCO parcial</td>
+                <td><span class="raci-r">R</span></td>
+                <td><span class="raci-c">C</span></td>
+                <td><span class="raci-r">R</span></td>
+                <td><span class="raci-a">A</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Aprovação de budget — Go/No-Go</td>
+                <td><span class="raci-c">C</span></td>
+                <td><span class="raci-i">I</span></td>
+                <td><span class="raci-i">I</span></td>
+                <td><span class="raci-a">A</span> / <span class="raci-r">R</span></td>
+              </tr>
+
+              <tr>
+                <td colspan="5"
+                  style="background:#F0F4FA; font-weight:800; color:var(--navy); font-size:12px; padding:8px 16px; letter-spacing:0.5px;">
+                  FASE 2 — RFQ & PROVAS DE CONCEITO (Mai–Ago 2026)</td>
+              </tr>
+              <tr>
+                <td class="td-label">Emissão e gestão do RFQ (GCP/Azure/OCI)</td>
+                <td><span class="raci-a">A</span></td>
+                <td><span class="raci-c">C</span></td>
+                <td><span class="raci-r">R</span></td>
+                <td><span class="raci-i">I</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Negociação de Enterprise Agreements</td>
+                <td><span class="raci-c">C</span></td>
+                <td><span class="raci-i">I</span></td>
+                <td><span class="raci-r">R</span> / <span class="raci-a">A</span></td>
+                <td><span class="raci-c">C</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Execução técnica das PoCs</td>
+                <td><span class="raci-r">R</span> / <span class="raci-a">A</span></td>
+                <td><span class="raci-r">R</span></td>
+                <td><span class="raci-c">C</span></td>
+                <td><span class="raci-i">I</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Scoring e decisão da "Cloud B"</td>
+                <td><span class="raci-r">R</span></td>
+                <td><span class="raci-c">C</span></td>
+                <td><span class="raci-c">C</span></td>
+                <td><span class="raci-a">A</span></td>
+              </tr>
+
+              <tr>
+                <td colspan="5"
+                  style="background:#F0F4FA; font-weight:800; color:var(--navy); font-size:12px; padding:8px 16px; letter-spacing:0.5px;">
+                  FASE 3 — ENGENHARIA & PARALELISMO (Jun–Nov 2026)</td>
+              </tr>
+              <tr>
+                <td class="td-label">Design de arquitetura de abstração portável</td>
+                <td><span class="raci-r">R</span> / <span class="raci-a">A</span></td>
+                <td><span class="raci-c">C</span></td>
+                <td><span class="raci-i">I</span></td>
+                <td><span class="raci-i">I</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Refatoração de código das Lambdas</td>
+                <td><span class="raci-c">C</span></td>
+                <td><span class="raci-r">R</span> / <span class="raci-a">A</span></td>
+                <td><span class="raci-i">I</span></td>
+                <td><span class="raci-i">I</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Módulos Terraform / IaC Multi-Cloud</td>
+                <td><span class="raci-c">C</span></td>
+                <td><span class="raci-r">R</span> / <span class="raci-a">A</span></td>
+                <td><span class="raci-i">I</span></td>
+                <td><span class="raci-i">I</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Configuração de Observabilidade Unificada</td>
+                <td><span class="raci-a">A</span></td>
+                <td><span class="raci-r">R</span></td>
+                <td><span class="raci-c">C</span></td>
+                <td><span class="raci-i">I</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Controle de budget (FinOps mensal)</td>
+                <td><span class="raci-i">I</span></td>
+                <td><span class="raci-i">I</span></td>
+                <td><span class="raci-r">R</span> / <span class="raci-a">A</span></td>
+                <td><span class="raci-c">C</span></td>
+              </tr>
+
+              <tr>
+                <td colspan="5"
+                  style="background:#F0F4FA; font-weight:800; color:var(--navy); font-size:12px; padding:8px 16px; letter-spacing:0.5px;">
+                  FASE 4 — STAGING, VALIDAÇÃO & CHAOS ENGINEERING (Out–Dez 2026)</td>
+              </tr>
+              <tr>
+                <td class="td-label">Design e execução de Chaos Engineering</td>
+                <td><span class="raci-a">A</span></td>
+                <td><span class="raci-r">R</span></td>
+                <td><span class="raci-c">C</span></td>
+                <td><span class="raci-i">I</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Aprovação de RTO/RPO validados</td>
+                <td><span class="raci-r">R</span></td>
+                <td><span class="raci-c">C</span></td>
+                <td><span class="raci-c">C</span></td>
+                <td><span class="raci-a">A</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Runbooks de Failover operacionais</td>
+                <td><span class="raci-c">C</span></td>
+                <td><span class="raci-r">R</span> / <span class="raci-a">A</span></td>
+                <td><span class="raci-i">I</span></td>
+                <td><span class="raci-i">I</span></td>
+              </tr>
+
+              <tr>
+                <td colspan="5"
+                  style="background:#F0F4FA; font-weight:800; color:var(--navy); font-size:12px; padding:8px 16px; letter-spacing:0.5px;">
+                  FASE 5 — GO-LIVE & RELATÓRIO EXECUTIVO (Jan 2027)</td>
+              </tr>
+              <tr>
+                <td class="td-label">Ativação do DR em Produção (Go-Live)</td>
+                <td><span class="raci-a">A</span></td>
+                <td><span class="raci-r">R</span></td>
+                <td><span class="raci-c">C</span></td>
+                <td><span class="raci-i">I</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Relatório Executivo de Encerramento</td>
+                <td><span class="raci-r">R</span></td>
+                <td><span class="raci-c">C</span></td>
+                <td><span class="raci-r">R</span></td>
+                <td><span class="raci-a">A</span></td>
+              </tr>
             </tbody>
           </table>
         </div>
       </div>
-    </div>
 
-    <div class="section">
-      <div class="section-header">
-        <div class="section-num">4</div>
-        <h2>Matriz RACI do Programa</h2>
-        <span class="section-tag">Arquitetura · Infraestrutura · Sustentação · Diretoria</span>
-      </div>
-
-      <div class="raci-legend">
-        <div class="raci-legend-item"><div class="raci-legend-dot" style="background:var(--red)"></div><strong class="raci-r">R — Responsible:</strong> Executa a atividade</div>
-        <div class="raci-legend-item"><div class="raci-legend-dot" style="background:var(--accent)"></div><strong class="raci-a">A — Accountable:</strong> Dono/aprovador final</div>
-        <div class="raci-legend-item"><div class="raci-legend-dot" style="background:var(--sky)"></div><strong class="raci-c">C — Consulted:</strong> Consultado, input bilateral</div>
-        <div class="raci-legend-item"><div class="raci-legend-dot" style="background:var(--muted)"></div><strong class="raci-i">I — Informed:</strong> Recebe atualização</div>
-      </div>
-
-      <div class="table-wrap" style="margin-top:16px;">
-        <table class="raci-table">
-          <thead>
-            <tr>
-              <th>Atividade / Entregável</th>
-              <th style="min-width:130px;">Arquitetura</th>
-              <th style="min-width:130px;">Infraestrutura</th>
-              <th style="min-width:130px;">Sustentação</th>
-              <th style="min-width:130px;">Diretoria</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td colspan="5" style="background:#F0F4FA; font-weight:800; color:var(--navy); font-size:12px; padding:8px 16px; letter-spacing:0.5px;">FASE 1 — ASSESSMENT & TRIAGE (Abr–Mai 2026)</td></tr>
-            <tr><td class="td-label">Inventário de Lambdas e dependências AWS</td><td><span class="raci-r">R</span> / <span class="raci-a">A</span></td><td><span class="raci-c">C</span></td><td><span class="raci-i">I</span></td><td><span class="raci-i">I</span></td></tr>
-            <tr><td class="td-label">Definição de RTO/RPO por tier</td><td><span class="raci-a">A</span></td><td><span class="raci-r">R</span></td><td><span class="raci-c">C</span></td><td><span class="raci-i">I</span></td></tr>
-            <tr><td class="td-label">Levantamento de TCO atual AWS (baseline)</td><td><span class="raci-c">C</span></td><td><span class="raci-c">C</span></td><td><span class="raci-r">R</span> / <span class="raci-a">A</span></td><td><span class="raci-i">I</span></td></tr>
-            
-            <tr><td colspan="5" style="background:#FEF9EC; font-weight:800; color:#B8720A; font-size:12px; padding:8px 16px; letter-spacing:0.5px;">MILESTONE — PITCH EXECUTIVO (Mês 2 — Maio 2026)</td></tr>
-            <tr><td class="td-label">Elaboração do Business Case e TCO parcial</td><td><span class="raci-r">R</span></td><td><span class="raci-c">C</span></td><td><span class="raci-r">R</span></td><td><span class="raci-a">A</span></td></tr>
-            <tr><td class="td-label">Aprovação de budget — Go/No-Go</td><td><span class="raci-c">C</span></td><td><span class="raci-i">I</span></td><td><span class="raci-i">I</span></td><td><span class="raci-a">A</span> / <span class="raci-r">R</span></td></tr>
-            
-            <tr><td colspan="5" style="background:#F0F4FA; font-weight:800; color:var(--navy); font-size:12px; padding:8px 16px; letter-spacing:0.5px;">FASE 2 — RFQ & PROVAS DE CONCEITO (Mai–Ago 2026)</td></tr>
-            <tr><td class="td-label">Emissão e gestão do RFQ (GCP/Azure/OCI)</td><td><span class="raci-a">A</span></td><td><span class="raci-c">C</span></td><td><span class="raci-r">R</span></td><td><span class="raci-i">I</span></td></tr>
-            <tr><td class="td-label">Negociação de Enterprise Agreements</td><td><span class="raci-c">C</span></td><td><span class="raci-i">I</span></td><td><span class="raci-r">R</span> / <span class="raci-a">A</span></td><td><span class="raci-c">C</span></td></tr>
-            <tr><td class="td-label">Execução técnica das PoCs</td><td><span class="raci-r">R</span> / <span class="raci-a">A</span></td><td><span class="raci-r">R</span></td><td><span class="raci-c">C</span></td><td><span class="raci-i">I</span></td></tr>
-            <tr><td class="td-label">Scoring e decisão da "Cloud B"</td><td><span class="raci-r">R</span></td><td><span class="raci-c">C</span></td><td><span class="raci-c">C</span></td><td><span class="raci-a">A</span></td></tr>
-            
-            <tr><td colspan="5" style="background:#F0F4FA; font-weight:800; color:var(--navy); font-size:12px; padding:8px 16px; letter-spacing:0.5px;">FASE 3 — ENGENHARIA & PARALELISMO (Jun–Nov 2026)</td></tr>
-            <tr><td class="td-label">Design de arquitetura de abstração portável</td><td><span class="raci-r">R</span> / <span class="raci-a">A</span></td><td><span class="raci-c">C</span></td><td><span class="raci-i">I</span></td><td><span class="raci-i">I</span></td></tr>
-            <tr><td class="td-label">Refatoração de código das Lambdas</td><td><span class="raci-c">C</span></td><td><span class="raci-r">R</span> / <span class="raci-a">A</span></td><td><span class="raci-i">I</span></td><td><span class="raci-i">I</span></td></tr>
-            <tr><td class="td-label">Módulos Terraform / IaC Multi-Cloud</td><td><span class="raci-c">C</span></td><td><span class="raci-r">R</span> / <span class="raci-a">A</span></td><td><span class="raci-i">I</span></td><td><span class="raci-i">I</span></td></tr>
-            <tr><td class="td-label">Configuração de Observabilidade Unificada</td><td><span class="raci-a">A</span></td><td><span class="raci-r">R</span></td><td><span class="raci-c">C</span></td><td><span class="raci-i">I</span></td></tr>
-            <tr><td class="td-label">Controle de budget (FinOps mensal)</td><td><span class="raci-i">I</span></td><td><span class="raci-i">I</span></td><td><span class="raci-r">R</span> / <span class="raci-a">A</span></td><td><span class="raci-c">C</span></td></tr>
-            
-            <tr><td colspan="5" style="background:#F0F4FA; font-weight:800; color:var(--navy); font-size:12px; padding:8px 16px; letter-spacing:0.5px;">FASE 4 — STAGING, VALIDAÇÃO & CHAOS ENGINEERING (Out–Dez 2026)</td></tr>
-            <tr><td class="td-label">Design e execução de Chaos Engineering</td><td><span class="raci-a">A</span></td><td><span class="raci-r">R</span></td><td><span class="raci-c">C</span></td><td><span class="raci-i">I</span></td></tr>
-            <tr><td class="td-label">Aprovação de RTO/RPO validados</td><td><span class="raci-r">R</span></td><td><span class="raci-c">C</span></td><td><span class="raci-c">C</span></td><td><span class="raci-a">A</span></td></tr>
-            <tr><td class="td-label">Runbooks de Failover operacionais</td><td><span class="raci-c">C</span></td><td><span class="raci-r">R</span> / <span class="raci-a">A</span></td><td><span class="raci-i">I</span></td><td><span class="raci-i">I</span></td></tr>
-            
-            <tr><td colspan="5" style="background:#F0F4FA; font-weight:800; color:var(--navy); font-size:12px; padding:8px 16px; letter-spacing:0.5px;">FASE 5 — GO-LIVE & RELATÓRIO EXECUTIVO (Jan 2027)</td></tr>
-            <tr><td class="td-label">Ativação do DR em Produção (Go-Live)</td><td><span class="raci-a">A</span></td><td><span class="raci-r">R</span></td><td><span class="raci-c">C</span></td><td><span class="raci-i">I</span></td></tr>
-            <tr><td class="td-label">Relatório Executivo de Encerramento</td><td><span class="raci-r">R</span></td><td><span class="raci-c">C</span></td><td><span class="raci-r">R</span></td><td><span class="raci-a">A</span></td></tr>
-          </tbody>
-        </table>
+      <div class="section">
+        <div class="section-header">
+          <div class="section-num">⚠</div>
+          <h2>Principais Riscos do Programa</h2>
+          <span class="section-tag">Risk Register Executivo</span>
+        </div>
+        <div class="risk-grid">
+          <div class="risk-item risk-high" style="background:#FFF5F5; border-color:#F5C6C6;">
+            <div class="risk-level">🔴 RISCO ALTO</div>
+            <strong style="font-size:13px; color:var(--navy);">Subestimação do escopo de refatoração</strong>
+            <p style="font-size:12.5px; color:#5A2020; margin-top:6px;"><strong>Mitigação:</strong> Assessment rigoroso
+              com análise estática de código (AST) nas primeiras semanas. Priorizar Tier 1 primeiro; Tier 3 pode ser
+              postergado para pós-Go-Live.</p>
+          </div>
+          <div class="risk-item risk-high" style="background:#FFF5F5; border-color:#F5C6C6;">
+            <div class="risk-level">🔴 RISCO ALTO</div>
+            <strong style="font-size:13px; color:var(--navy);">Atraso no Go/No-Go Executivo (Mês 2)</strong>
+            <p style="font-size:12.5px; color:#5A2020; margin-top:6px;"><strong>Mitigação:</strong> Pre-align com
+              sponsor C-Level antes da apresentação formal. Briefing executivo intermediário já no Mês 1.</p>
+          </div>
+          <div class="risk-item risk-med" style="background:#FEF9EC; border-color:#F5D98A;">
+            <div class="risk-level">🟡 RISCO MÉDIO</div>
+            <strong style="font-size:13px; color:var(--navy);">Negociação de EA mais longa que o previsto</strong>
+            <p style="font-size:12.5px; color:#5A4A20; margin-top:6px;"><strong>Mitigação:</strong> Iniciar contato com
+              account managers dos vendors no Mês 1, antes do Go/No-Go formal. Estabelecer deadline de proposta no RFQ.
+            </p>
+          </div>
+          <div class="risk-item risk-med" style="background:#FEF9EC; border-color:#F5D98A;">
+            <div class="risk-level">🟡 RISCO MÉDIO</div>
+            <strong style="font-size:13px; color:var(--navy);">Drift de configuração entre AWS e Cloud B</strong>
+            <p style="font-size:12.5px; color:#5A4A20; margin-top:6px;"><strong>Mitigação:</strong> Pipeline CI/CD com
+              deploy simultâneo desde o primeiro deploy. Nenhum push manual em Cloud B.</p>
+          </div>
+          <div class="risk-item risk-low" style="background:#F0FFF8; border-color:#9FE0C4;">
+            <div class="risk-level">🟢 RISCO BAIXO</div>
+            <strong style="font-size:13px; color:var(--navy);">Perda de observabilidade durante transição</strong>
+            <p style="font-size:12.5px; color:#0A3A25; margin-top:6px;"><strong>Mitigação:</strong> CloudWatch permanece
+              ativo em AWS durante todo o projeto. Datadog/Grafana é adicionado como camada extra, nunca substituto
+              imediato.</p>
+          </div>
+          <div class="risk-item risk-low" style="background:#F0FFF8; border-color:#9FE0C4;">
+            <div class="risk-level">🟢 RISCO BAIXO</div>
+            <strong style="font-size:13px; color:var(--navy);">Resistência cultural ao Multi-Cloud (engenharia)</strong>
+            <p style="font-size:12.5px; color:#0A3A25; margin-top:6px;"><strong>Mitigação:</strong> Champions por squad
+              treinados desde a Fase 1. Certificações GCP/Azure custeadas pela empresa.</p>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="section">
-      <div class="section-header">
-        <div class="section-num">⚠</div>
-        <h2>Principais Riscos do Programa</h2>
-        <span class="section-tag">Risk Register Executivo</span>
-      </div>
-      <div class="risk-grid">
-        <div class="risk-item risk-high" style="background:#FFF5F5; border-color:#F5C6C6;">
-          <div class="risk-level">🔴 RISCO ALTO</div>
-          <strong style="font-size:13px; color:var(--navy);">Subestimação do escopo de refatoração</strong>
-          <p style="font-size:12.5px; color:#5A2020; margin-top:6px;"><strong>Mitigação:</strong> Assessment rigoroso com análise estática de código (AST) nas primeiras semanas. Priorizar Tier 1 primeiro; Tier 3 pode ser postergado para pós-Go-Live.</p>
-        </div>
-        <div class="risk-item risk-high" style="background:#FFF5F5; border-color:#F5C6C6;">
-          <div class="risk-level">🔴 RISCO ALTO</div>
-          <strong style="font-size:13px; color:var(--navy);">Atraso no Go/No-Go Executivo (Mês 2)</strong>
-          <p style="font-size:12.5px; color:#5A2020; margin-top:6px;"><strong>Mitigação:</strong> Pre-align com sponsor C-Level antes da apresentação formal. Briefing executivo intermediário já no Mês 1.</p>
-        </div>
-        <div class="risk-item risk-med" style="background:#FEF9EC; border-color:#F5D98A;">
-          <div class="risk-level">🟡 RISCO MÉDIO</div>
-          <strong style="font-size:13px; color:var(--navy);">Negociação de EA mais longa que o previsto</strong>
-          <p style="font-size:12.5px; color:#5A4A20; margin-top:6px;"><strong>Mitigação:</strong> Iniciar contato com account managers dos vendors no Mês 1, antes do Go/No-Go formal. Estabelecer deadline de proposta no RFQ.</p>
-        </div>
-        <div class="risk-item risk-med" style="background:#FEF9EC; border-color:#F5D98A;">
-          <div class="risk-level">🟡 RISCO MÉDIO</div>
-          <strong style="font-size:13px; color:var(--navy);">Drift de configuração entre AWS e Cloud B</strong>
-          <p style="font-size:12.5px; color:#5A4A20; margin-top:6px;"><strong>Mitigação:</strong> Pipeline CI/CD com deploy simultâneo desde o primeiro deploy. Nenhum push manual em Cloud B.</p>
-        </div>
-        <div class="risk-item risk-low" style="background:#F0FFF8; border-color:#9FE0C4;">
-          <div class="risk-level">🟢 RISCO BAIXO</div>
-          <strong style="font-size:13px; color:var(--navy);">Perda de observabilidade durante transição</strong>
-          <p style="font-size:12.5px; color:#0A3A25; margin-top:6px;"><strong>Mitigação:</strong> CloudWatch permanece ativo em AWS durante todo o projeto. Datadog/Grafana é adicionado como camada extra, nunca substituto imediato.</p>
-        </div>
-        <div class="risk-item risk-low" style="background:#F0FFF8; border-color:#9FE0C4;">
-          <div class="risk-level">🟢 RISCO BAIXO</div>
-          <strong style="font-size:13px; color:var(--navy);">Resistência cultural ao Multi-Cloud (engenharia)</strong>
-          <p style="font-size:12.5px; color:#0A3A25; margin-top:6px;"><strong>Mitigação:</strong> Champions por squad treinados desde a Fase 1. Certificações GCP/Azure custeadas pela empresa.</p>
-        </div>
-      </div>
+    <div class="doc-footer">
+      <p><strong>Plano de Contingenciamento & DR Cross-Cloud</strong> — Documento Executivo & Técnico v2.1</p>
+      <p style="margin-top:4px;">Elaborado por Principal Solutions Architect / Enterprise Program Manager | Revisão
+        recomendada a cada 60 dias ou após milestone concluído</p>
+      <p style="margin-top:4px;">📋 Fontes oficiais verificadas (2025–2026): AWS Lambda free tier (1M requests/mês) ·
+        GCP Cloud Functions free tier (2M requests/mês) · Azure Functions Consumption free grant (1M executions/mês) ·
+        OCI Functions Always Free (2M requests/mês) · GCS S3 interoperability via XML API + HMAC · OCI Object Storage
+        native S3-compatible · GCP egress pricing Premium Tier ~$0.12/GB · OCI egress 10 TB/mês free · GCP São Paulo
+        region southamerica-east1 · Azure Event Grid 100k operations/mês free · KEDA integrado com GKE/AKS · CloudEvents
+        open specification · Workload Identity Federation cross-cloud. Todos os valores financeiros são estimativas
+        orientadoras — calibrar com baseline real do Assessment (Fase 1).</p>
     </div>
   </div>
 
-  <div class="doc-footer">
-    <p><strong>Plano de Contingenciamento & DR Cross-Cloud</strong> — Documento Executivo & Técnico v2.1</p>
-    <p style="margin-top:4px;">Elaborado por Principal Solutions Architect / Enterprise Program Manager | Revisão recomendada a cada 60 dias ou após milestone concluído</p>
-    <p style="margin-top:4px;">📋 Fontes oficiais verificadas (2025–2026): AWS Lambda free tier (1M requests/mês) · GCP Cloud Functions free tier (2M requests/mês) · Azure Functions Consumption free grant (1M executions/mês) · OCI Functions Always Free (2M requests/mês) · GCS S3 interoperability via XML API + HMAC · OCI Object Storage native S3-compatible · GCP egress pricing Premium Tier ~$0.12/GB · OCI egress 10 TB/mês free · GCP São Paulo region southamerica-east1 · Azure Event Grid 100k operations/mês free · KEDA integrado com GKE/AKS · CloudEvents open specification · Workload Identity Federation cross-cloud. Todos os valores financeiros são estimativas orientadoras — calibrar com baseline real do Assessment (Fase 1).</p>
+  <div class="edit-panel" id="editPanel">
+    <button id="toggleEditBtn" class="btn btn-primary">Ativar Edição</button>
+    <button id="saveBtn" class="btn btn-success" style="display: none;">Salvar Alterações</button>
+    <button id="resetBtn" class="btn btn-danger" style="display: none;">Restaurar Original</button>
+    <span id="statusMessage" class="status-msg"></span>
   </div>
-</div>
 
-<div class="edit-panel" id="editPanel">
-  <button id="toggleEditBtn" class="btn btn-primary">Ativar Edição</button>
-  <button id="saveBtn" class="btn btn-success" style="display: none;">Salvar Alterações</button>
-  <button id="resetBtn" class="btn btn-danger" style="display: none;">Restaurar Original</button>
-  <span id="statusMessage" class="status-msg"></span>
-</div>
-
-<script src="js/app.js"></script>
+  <script src="js/app.js"></script>
 </body>
+
 </html>
