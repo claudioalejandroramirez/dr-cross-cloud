@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let isEditing = false;
 
-    // A chave de salvamento 'v3' garante que o navegador vai ignorar os dados antigos quebrados
-    const STORAGE_KEY = 'dr_plan_content_v3';
+    // A chave de salvamento 'v4' garante compatibilidade com as novas funcionalidades
+    const STORAGE_KEY = 'dr_plan_content_v4';
 
     loadSavedContent();
 
@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     saveBtn.addEventListener('click', () => {
-        // Super importante: limpar os botões de controle de tabela antes de salvar o HTML!
         removeEditingUI();
 
         const currentHTML = contentArea.innerHTML;
@@ -27,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         showStatus('Salvo com sucesso no seu navegador! ✅');
 
-        // Religa o modo de edição em meio segundo para continuar o trabalho visualmente
         setTimeout(() => enableEditing(), 300);
     });
 
@@ -39,70 +37,224 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ==========================================
-    // LÓGICA DE MANIPULAÇÃO DA TABELA GANTT
+    // LÓGICA GENÉRICA DE EDIÇÃO DE TABELAS
     // ==========================================
+
+    let tableCounter = 0;
 
     function addEditingUI() {
         if (!isEditing) return;
+
+        // Aplica controles de edição em TODAS as tabelas do documento
+        const allTables = contentArea.querySelectorAll('table');
+        allTables.forEach((table) => {
+            // Atribui um ID temporário se não tiver
+            if (!table.id) {
+                table.id = 'editable-table-' + (tableCounter++);
+            }
+            addTableControls(table);
+        });
+
+        // Funcionalidade extra: Barras coloridas do Gantt
         const ganttTable = document.getElementById('gantt-table');
-        if (!ganttTable) return;
+        if (ganttTable) {
+            addGanttBarEditing(ganttTable);
+        }
+    }
 
-        // 1. Botões de Remover Coluna (Adicionados dentro dos <th >)
-        const headers = ganttTable.querySelectorAll('thead th');
-        headers.forEach((th, index) => {
-            if (index === 0) return; // Protege a primeira coluna (Nomes das Frentes)
+    // --- Controles genéricos para qualquer tabela ---
+    function addTableControls(table) {
+        const tableId = table.id;
 
-            if (!th.querySelector('.remove-col-btn')) {
-                const btn = document.createElement('button');
-                btn.className = 'remove-col-btn';
-                btn.innerHTML = '×';
-                btn.title = 'Remover este mês';
-                btn.onclick = () => removeColumn(index);
-                th.appendChild(btn);
-            }
-        });
+        // 1. Botões de Remover Coluna nos headers
+        const thead = table.querySelector('thead');
+        if (thead) {
+            const headers = thead.querySelectorAll('th');
+            headers.forEach((th, index) => {
+                // Pula colspan headers (divisores de seção como o RACI)
+                if (th.colSpan > 1) return;
+                if (index === 0) return; // Protege a primeira coluna
 
-        // 2. Botões de Remover Linha (Flutuantes dentro da primeira célula <td>)
-        const rows = ganttTable.querySelectorAll('tbody tr');
-        rows.forEach((tr) => {
-            const firstCell = tr.querySelector('td.row-label');
-            if (firstCell && !firstCell.querySelector('.remove-row-btn')) {
-                const btn = document.createElement('button');
-                btn.className = 'remove-row-btn';
-                btn.innerHTML = '×';
-                btn.title = 'Remover esta linha';
-                btn.onclick = () => tr.remove();
-                firstCell.insertBefore(btn, firstCell.firstChild);
-            }
-        });
-
-        // 3. Botões Globais de Adicionar Linha/Coluna
-        if (!document.getElementById('gantt-controls')) {
-            const container = document.getElementById('gantt-container');
-            const controls = document.createElement('div');
-            controls.id = 'gantt-controls';
-            controls.className = 'table-controls';
-            controls.innerHTML = `
-                <button class="btn btn-sm btn-primary" onclick="addRow()">+ Adicionar Linha</button>
-                <button class="btn btn-sm btn-primary" onclick="addColumn()">+ Adicionar Coluna (Mês)</button>
-            `;
-            container.parentNode.insertBefore(controls, container.nextSibling);
+                if (!th.querySelector('.remove-col-btn')) {
+                    const btn = document.createElement('button');
+                    btn.className = 'remove-col-btn';
+                    btn.innerHTML = '×';
+                    btn.title = 'Remover esta coluna';
+                    btn.onclick = (e) => {
+                        e.stopPropagation();
+                        genericRemoveColumn(tableId, index);
+                    };
+                    th.appendChild(btn);
+                }
+            });
         }
 
-        // 4. Edição de marcadores (Barras coloridas) nas células
+        // 2. Botões de Remover Linha no tbody
+        const tbody = table.querySelector('tbody');
+        if (tbody) {
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach((tr) => {
+                const firstCell = tr.querySelector('td');
+                if (!firstCell) return;
+                // Pula linhas que são divisores (colspan)
+                if (firstCell.colSpan > 1) return;
+
+                if (!firstCell.querySelector('.remove-row-btn')) {
+                    // Adiciona position:relative se necessário
+                    if (getComputedStyle(firstCell).position === 'static') {
+                        firstCell.style.position = 'relative';
+                    }
+                    const btn = document.createElement('button');
+                    btn.className = 'remove-row-btn';
+                    btn.innerHTML = '×';
+                    btn.title = 'Remover esta linha';
+                    btn.onclick = (e) => {
+                        e.stopPropagation();
+                        tr.remove();
+                    };
+                    firstCell.insertBefore(btn, firstCell.firstChild);
+                }
+            });
+        }
+
+        // 3. Botões de Adicionar Linha/Coluna (abaixo da tabela)
+        const controlsId = 'table-controls-' + tableId;
+        if (!document.getElementById(controlsId)) {
+            const controls = document.createElement('div');
+            controls.id = controlsId;
+            controls.className = 'table-controls';
+            controls.innerHTML = `
+                <button class="btn btn-sm btn-primary" data-action="add-row" data-table="${tableId}">+ Adicionar Linha</button>
+                <button class="btn btn-sm btn-primary" data-action="add-col" data-table="${tableId}">+ Adicionar Coluna</button>
+            `;
+            controls.querySelector('[data-action="add-row"]').onclick = () => genericAddRow(tableId);
+            controls.querySelector('[data-action="add-col"]').onclick = () => genericAddColumn(tableId);
+
+            // Insere após o wrapper (.table-wrap) ou após a própria tabela
+            const wrapper = table.closest('.table-wrap') || table.closest('.card') || table.parentNode;
+            wrapper.parentNode.insertBefore(controls, wrapper.nextSibling);
+        }
+    }
+
+    // --- Funções genéricas de manipulação ---
+    function genericAddRow(tableId) {
+        const table = document.getElementById(tableId);
+        if (!table) return;
+        const tbody = table.querySelector('tbody') || table;
+        const headerRow = table.querySelector('thead tr') || table.querySelector('tr');
+        if (!headerRow) return;
+
+        const newRow = tbody.insertRow();
+        const colCount = headerRow.cells.length;
+
+        for (let i = 0; i < colCount; i++) {
+            const cell = newRow.insertCell();
+            if (i === 0) {
+                // Primeira coluna: estilo de label
+                const isGantt = tableId === 'gantt-table';
+                cell.className = isGantt ? 'row-label' : 'td-label';
+                cell.innerText = 'Nova linha';
+            } else {
+                // Demais colunas
+                const isGantt = tableId === 'gantt-table';
+                if (isGantt) {
+                    cell.className = 'cell-bar';
+                    cell.innerHTML = ' ';
+                } else {
+                    cell.innerText = '—';
+                }
+            }
+        }
+
+        disableEditing();
+        enableEditing();
+    }
+
+    function genericAddColumn(tableId) {
+        const table = document.getElementById(tableId);
+        if (!table) return;
+
+        // Adiciona header
+        const theadTr = table.querySelector('thead tr');
+        if (theadTr) {
+            const newTh = document.createElement('th');
+            newTh.innerText = 'Nova coluna';
+            theadTr.appendChild(newTh);
+        }
+
+        // Adiciona célula em cada linha do tbody
+        const tbodyRows = table.querySelectorAll('tbody tr');
+        tbodyRows.forEach(tr => {
+            // Pula linhas com colspan (divisores de seção)
+            const firstTd = tr.querySelector('td');
+            if (firstTd && firstTd.colSpan > 1) {
+                firstTd.colSpan = firstTd.colSpan + 1;
+                return;
+            }
+
+            const cell = tr.insertCell();
+            const isGantt = tableId === 'gantt-table';
+            if (isGantt) {
+                cell.className = 'cell-bar';
+                cell.innerHTML = ' ';
+            } else {
+                cell.innerText = '—';
+            }
+        });
+
+        disableEditing();
+        enableEditing();
+    }
+
+    function genericRemoveColumn(tableId, index) {
+        if (!confirm('Deseja realmente excluir esta coluna inteira?')) return;
+        const table = document.getElementById(tableId);
+        if (!table) return;
+
+        const rows = table.querySelectorAll('tr');
+        rows.forEach(row => {
+            // Pula linhas com colspan (divisores)
+            const firstCell = row.cells[0];
+            if (firstCell && firstCell.colSpan > 1) {
+                firstCell.colSpan = Math.max(1, firstCell.colSpan - 1);
+                return;
+            }
+            if (row.cells.length > index) {
+                row.deleteCell(index);
+            }
+        });
+
+        disableEditing();
+        enableEditing();
+    }
+
+    // ==========================================
+    // LÓGICA ESPECÍFICA DO GANTT (Barras coloridas)
+    // ==========================================
+
+    function addGanttBarEditing(ganttTable) {
         const cellBars = ganttTable.querySelectorAll('.cell-bar');
         cellBars.forEach(cell => {
             cell.style.cursor = 'pointer';
-            cell.title = 'Clique p/ mudar cor. Shift+Clique p/ definir tamanho ou Marco.';
+            cell.title = 'Clique p/ cor. Shift+Clique p/ tamanho. Ctrl+Clique p/ inserir texto.';
             cell.onclick = (e) => {
                 if (!isEditing) return;
 
-                // Ignorar se clicou na span do milestone porque ela será editável em texto
                 if (e.target.tagName === 'SPAN' && e.target.hasAttribute('contenteditable')) return;
 
                 let bar = cell.querySelector('.bar');
 
-                // Shift + Clique: Editar largura da barra ou criar um Milestone
+                // Ctrl + Clique: Inserir texto (Marco/Milestone)
+                if (e.ctrlKey || e.metaKey) {
+                    let text = prompt('Insira o texto para a célula (ex: MÊS 2, Jan/27) ou deixe vazio p/ cancelar:');
+                    if (text) {
+                        cell.style.textAlign = 'center';
+                        cell.innerHTML = `<span style="background:var(--accent);color:var(--navy);padding:2px 8px;border-radius:6px;font-weight:800;font-size:11px;" contenteditable="true">${text}</span>`;
+                    }
+                    return;
+                }
+
+                // Shift + Clique: Editar largura ou criar Milestone
                 if (e.shiftKey) {
                     if (bar) {
                         let currentWidth = bar.style.width ? bar.style.width.replace('%', '') : '100';
@@ -111,7 +263,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             bar.style.width = newWidth + '%';
                         }
                     } else {
-                        // Não tem barra, criar um texto de Milestone
                         let text = prompt('Insira o texto para o marco especial (ex: MÊS 2) ou deixe vazio para cancelar:');
                         if (text) {
                             cell.style.textAlign = 'center';
@@ -126,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (!bar) {
                     cell.innerHTML = '';
-                    cell.style.textAlign = ''; // reseta alinhamento se for depois de um milestone
+                    cell.style.textAlign = '';
                     bar = document.createElement('div');
                     bar.className = 'bar ' + colors[0];
                     bar.style.width = '100%';
@@ -137,7 +288,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 let currentColorIndex = colors.findIndex(c => bar.classList.contains(c));
 
                 if (currentColorIndex === -1 || currentColorIndex === colors.length - 1) {
-                    // Remover barra no último ciclo
                     cell.innerHTML = ' ';
                 } else {
                     bar.classList.remove(colors[currentColorIndex]);
@@ -147,12 +297,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ==========================================
+    // LIMPEZA DO UI DE EDIÇÃO
+    // ==========================================
+
     function removeEditingUI() {
-        // Limpa a sujeira do HTML antes de jogar no localStorage
-        document.querySelectorAll('.remove-col-btn, .remove-row-btn, #gantt-controls').forEach(el => el.remove());
+        // Remove todos os botões de controle e atributos de edição
+        document.querySelectorAll('.remove-col-btn, .remove-row-btn').forEach(el => el.remove());
+        document.querySelectorAll('[id^="table-controls-"]').forEach(el => el.remove());
         document.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
 
-        // Remove cursores e eventos de células
+        // Remove IDs temporários das tabelas genéricas
+        document.querySelectorAll('[id^="editable-table-"]').forEach(el => el.removeAttribute('id'));
+
+        // Remove cursores e eventos das células do Gantt
         const ganttTable = document.getElementById('gantt-table');
         if (ganttTable) {
             ganttTable.querySelectorAll('.cell-bar').forEach(cell => {
@@ -161,60 +319,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 cell.onclick = null;
             });
         }
+
+        // Limpa position:relative adicionado dinamicamente
+        document.querySelectorAll('td[style*="position: relative"]').forEach(td => {
+            td.style.position = '';
+        });
     }
-
-    // Expondo as funções para acesso global no botão
-    window.addRow = () => {
-        const ganttTable = document.getElementById('gantt-table');
-        const tbody = ganttTable.querySelector('tbody');
-        const headerRow = ganttTable.querySelector('thead tr');
-        const newRow = tbody.insertRow();
-
-        for (let i = 0; i < headerRow.cells.length; i++) {
-            const cell = newRow.insertCell();
-            if (i === 0) {
-                cell.className = 'row-label';
-                cell.innerText = 'Nova Frente';
-            } else {
-                cell.className = 'cell-bar';
-                cell.innerHTML = ' '; // Espaço vazio para não quebrar a largura
-            }
-        }
-
-        disableEditing();
-        enableEditing();
-    };
-
-    window.addColumn = () => {
-        const ganttTable = document.getElementById('gantt-table');
-        const theadTr = ganttTable.querySelector('thead tr');
-        const newTh = document.createElement('th');
-        newTh.innerText = 'Novo Mês';
-        theadTr.appendChild(newTh);
-
-        const tbodyRows = ganttTable.querySelectorAll('tbody tr');
-        tbodyRows.forEach(tr => {
-            const cell = tr.insertCell();
-            cell.className = 'cell-bar';
-            cell.innerHTML = ' ';
-        });
-
-        disableEditing();
-        enableEditing();
-    };
-
-    window.removeColumn = (index) => {
-        if (!confirm('Deseja realmente excluir esta coluna inteira?')) return;
-        const ganttTable = document.getElementById('gantt-table');
-        const rows = ganttTable.querySelectorAll('tr');
-        rows.forEach(row => {
-            if (row.cells.length > index) {
-                row.deleteCell(index);
-            }
-        });
-        disableEditing();
-        enableEditing();
-    };
 
     // ==========================================
     // FUNÇÕES DE GERENCIAMENTO DE ESTADO
@@ -228,8 +338,8 @@ document.addEventListener('DOMContentLoaded', () => {
         saveBtn.style.display = 'block';
         resetBtn.style.display = 'block';
 
-        // Torna os textos do documento editáveis, pulando botões e barras de progresso
-        const editableElements = contentArea.querySelectorAll('h1, h2, h3, h4, p, li, th, td.row-label, .val, .sub, .tl-phase, label, span');
+        // Torna os textos do documento editáveis
+        const editableElements = contentArea.querySelectorAll('h1, h2, h3, h4, p, li, th, td, .val, .sub, .tl-phase, label, span');
 
         editableElements.forEach(el => {
             if (!el.classList.contains('bar') && !el.classList.contains('dot') && !el.classList.contains('remove-row-btn')) {
@@ -238,7 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         addEditingUI();
-        showStatus('Edição ativada✍️ Clique nas células p/ criar barras, Shift+Clique p/ tamanho/marco');
+        showStatus('Edição ativada ✍️ Todas as tabelas são editáveis. Gantt: Clique p/ cor, Shift p/ tamanho, Ctrl p/ texto.');
     }
 
     function disableEditing() {
