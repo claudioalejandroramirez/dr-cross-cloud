@@ -4,9 +4,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const saveBtn = document.getElementById('saveBtn');
     const resetBtn = document.getElementById('resetBtn');
     const exportPdfBtn = document.getElementById('exportPdfBtn');
-    const exportBackupBtn = document.getElementById('exportBackupBtn');
-    const importBackupBtn = document.getElementById('importBackupBtn');
-    const importBackupInput = document.getElementById('importBackupInput');
     const statusMessage = document.getElementById('statusMessage');
 
     let isEditing = false;
@@ -45,21 +42,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     exportPdfBtn.addEventListener('click', () => {
         exportToPdf();
-    });
-
-    exportBackupBtn.addEventListener('click', () => {
-        exportBackupFile();
-    });
-
-    importBackupBtn.addEventListener('click', () => {
-        importBackupInput.click();
-    });
-
-    importBackupInput.addEventListener('change', async (event) => {
-        const file = event.target.files && event.target.files[0];
-        if (!file) return;
-        await importBackupFile(file);
-        importBackupInput.value = '';
     });
 
     window.addEventListener('beforeprint', () => {
@@ -566,39 +548,4 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 120);
     }
 
-    function exportBackupFile() {
-        const payload = {
-            exportedAt: new Date().toISOString(),
-            source: 'dr-cross-cloud',
-            version: 1,
-            html: getCleanSnapshotHTML()
-        };
-        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
-        a.href = url;
-        a.download = `dr-cross-cloud-backup-${stamp}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        showStatus('Backup exportado com sucesso.');
-    }
-
-    async function importBackupFile(file) {
-        try {
-            const text = await file.text();
-            const payload = JSON.parse(text);
-            if (!payload || typeof payload.html !== 'string') {
-                throw new Error('Formato de backup invalido.');
-            }
-
-            contentArea.innerHTML = payload.html;
-            localStorage.setItem(STORAGE_KEY, payload.html);
-            await writeToIndexedDB(DB_KEY, payload.html);
-
-            showStatus('Backup importado e aplicado com sucesso ✅');
-        } catch (error) {
-            showStatus('Falha ao importar backup. Verifique o arquivo JSON.');
-        }
-    }
 });
