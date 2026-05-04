@@ -846,6 +846,12 @@ ul.checklist li::before {
   color: #fff;
 }
 
+.btn-secondary {
+  background: #EEF3FB;
+  color: var(--navy);
+  border: 1px solid #CFD9EC;
+}
+
 .btn-danger {
   background: #FFF5F5;
   color: var(--red);
@@ -938,4 +944,55 @@ ul.checklist li::before {
 .editing-mode .table-wrap td:first-child,
 .editing-mode .td-label {
   padding-left: 30px !important;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 16mm 14mm 18mm 14mm;
+  }
+
+  body {
+    background: #fff !important;
+    color: #111 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .cover {
+    min-height: auto;
+    padding: 36px 40px;
+  }
+
+  .container {
+    max-width: 100%;
+    padding: 18px 0;
+  }
+
+  .section,
+  .card,
+  .milestone-card,
+  .pitch-card,
+  .arg-card,
+  .risk-item,
+  .table-wrap {
+    break-inside: avoid-page;
+    page-break-inside: avoid;
+  }
+
+  .section-header {
+    break-after: avoid-page;
+    page-break-after: avoid;
+  }
+
+  .timeline::before {
+    background: #d9e1ef;
+  }
+
+  .doc-footer {
+    margin-top: 16px;
+    background: #fff;
+    color: #4a5568;
+    border-top: 1px solid #dbe3f2;
+  }
 }

@@ -1,16 +1,28 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const contentArea = document.getElementById('document-content');
     const toggleEditBtn = document.getElementById('toggleEditBtn');
     const saveBtn = document.getElementById('saveBtn');
     const resetBtn = document.getElementById('resetBtn');
+    const exportPdfBtn = document.getElementById('exportPdfBtn');
+    const exportBackupBtn = document.getElementById('exportBackupBtn');
+    const importBackupBtn = document.getElementById('importBackupBtn');
+    const importBackupInput = document.getElementById('importBackupInput');
     const statusMessage = document.getElementById('statusMessage');
 
     let isEditing = false;
+    let autosaveTimer = null;
+    let restoreEditingAfterPrint = false;
 
-    // A chave de salvamento 'v4' garante compatibilidade com as novas funcionalidades
-    const STORAGE_KEY = 'dr_plan_content_v4';
+    // Versão nova da chave para manter histórico de compatibilidade.
+    const STORAGE_KEY = 'dr_plan_content_v5';
+    const LEGACY_STORAGE_KEY = 'dr_plan_content_v4';
+    const DB_NAME = 'dr_cross_cloud_editor';
+    const DB_STORE = 'documents';
+    const DB_KEY = 'main-content';
+    const AUTO_SAVE_DELAY_MS = 1200;
 
-    loadSavedContent();
+    await requestPersistentStorage();
+    await loadSavedContent();
 
     toggleEditBtn.addEventListener('click', () => {
         isEditing = !isEditing;
@@ -18,21 +30,49 @@ document.addEventListener('DOMContentLoaded', () => {
         else disableEditing();
     });
 
-    saveBtn.addEventListener('click', () => {
-        removeEditingUI();
-
-        const currentHTML = contentArea.innerHTML;
-        localStorage.setItem(STORAGE_KEY, currentHTML);
-
-        showStatus('Salvo com sucesso no seu navegador! ✅');
-
-        setTimeout(() => enableEditing(), 300);
+    saveBtn.addEventListener('click', async () => {
+        await persistCurrentContent(true);
     });
 
-    resetBtn.addEventListener('click', () => {
+    resetBtn.addEventListener('click', async () => {
         if (confirm('Restaurar original? Todas as alterações feitas por você serão perdidas.')) {
             localStorage.removeItem(STORAGE_KEY);
+            localStorage.removeItem(LEGACY_STORAGE_KEY);
+            await removeFromIndexedDB(DB_KEY);
             location.reload();
+        }
+    });
+
+    exportPdfBtn.addEventListener('click', () => {
+        exportToPdf();
+    });
+
+    exportBackupBtn.addEventListener('click', () => {
+        exportBackupFile();
+    });
+
+    importBackupBtn.addEventListener('click', () => {
+        importBackupInput.click();
+    });
+
+    importBackupInput.addEventListener('change', async (event) => {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+        await importBackupFile(file);
+        importBackupInput.value = '';
+    });
+
+    window.addEventListener('beforeprint', () => {
+        restoreEditingAfterPrint = isEditing;
+        if (isEditing) {
+            disableEditing();
+        }
+    });
+
+    window.addEventListener('afterprint', () => {
+        if (restoreEditingAfterPrint) {
+            enableEditing();
+            restoreEditingAfterPrint = false;
         }
     });
 
@@ -348,6 +388,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         addEditingUI();
+        addAutosaveListener();
         showStatus('Edição ativada ✍️ Todas as tabelas são editáveis. Gantt: Clique p/ cor, Shift p/ tamanho, Ctrl p/ texto.');
     }
 
@@ -359,14 +400,28 @@ document.addEventListener('DOMContentLoaded', () => {
         saveBtn.style.display = 'none';
         resetBtn.style.display = 'none';
 
+        removeAutosaveListener();
         removeEditingUI();
         showStatus('');
     }
 
-    function loadSavedContent() {
-        const savedData = localStorage.getItem(STORAGE_KEY);
+    async function loadSavedContent() {
+        let savedData = localStorage.getItem(STORAGE_KEY);
+        if (!savedData) {
+            savedData = await readFromIndexedDB(DB_KEY);
+        }
+        if (!savedData) {
+            savedData = localStorage.getItem(LEGACY_STORAGE_KEY);
+            if (savedData) {
+                await writeToIndexedDB(DB_KEY, savedData);
+                localStorage.setItem(STORAGE_KEY, savedData);
+            }
+        }
+
         if (savedData) {
             contentArea.innerHTML = savedData;
+            showStatus('Rascunho persistente recuperado automaticamente.');
+            setTimeout(() => { statusMessage.textContent = ''; }, 2800);
         }
     }
 
@@ -374,6 +429,176 @@ document.addEventListener('DOMContentLoaded', () => {
         statusMessage.textContent = text;
         if (text.includes('Salvo')) {
             setTimeout(() => { statusMessage.textContent = 'Modo edição ativado ✍️'; }, 3000);
+        }
+    }
+
+    function addAutosaveListener() {
+        contentArea.addEventListener('input', scheduleAutosave);
+    }
+
+    function removeAutosaveListener() {
+        contentArea.removeEventListener('input', scheduleAutosave);
+        if (autosaveTimer) {
+            clearTimeout(autosaveTimer);
+            autosaveTimer = null;
+        }
+    }
+
+    function scheduleAutosave() {
+        if (!isEditing) return;
+        if (autosaveTimer) clearTimeout(autosaveTimer);
+        autosaveTimer = setTimeout(async () => {
+            await persistCurrentContent(false);
+        }, AUTO_SAVE_DELAY_MS);
+    }
+
+    async function persistCurrentContent(showSuccessMessage) {
+        const currentHTML = getCleanSnapshotHTML();
+        localStorage.setItem(STORAGE_KEY, currentHTML);
+        await writeToIndexedDB(DB_KEY, currentHTML);
+
+        if (showSuccessMessage) {
+            showStatus('Salvo com persistência local reforçada (Storage + IndexedDB) ✅');
+        } else {
+            statusMessage.textContent = 'Auto-save ativo';
+        }
+    }
+
+    function getCleanSnapshotHTML() {
+        const clone = contentArea.cloneNode(true);
+        clone.querySelectorAll('.remove-col-btn, .remove-row-btn, [id^="table-controls-"]').forEach(el => el.remove());
+        clone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+        clone.querySelectorAll('[id^="editable-table-"]').forEach(el => el.removeAttribute('id'));
+        clone.querySelectorAll('.cell-bar').forEach(cell => {
+            cell.style.cursor = '';
+            cell.title = '';
+        });
+        clone.querySelectorAll('td[style*="position: relative"]').forEach(td => {
+            td.style.position = '';
+        });
+        return clone.innerHTML;
+    }
+
+    async function requestPersistentStorage() {
+        if (!navigator.storage || !navigator.storage.persist) return;
+        try {
+            const isPersistent = await navigator.storage.persisted();
+            if (!isPersistent) {
+                await navigator.storage.persist();
+            }
+        } catch (error) {
+            console.warn('Nao foi possivel pedir persistent storage:', error);
+        }
+    }
+
+    function openIndexedDB() {
+        return new Promise((resolve, reject) => {
+            if (!window.indexedDB) {
+                reject(new Error('IndexedDB nao suportado'));
+                return;
+            }
+
+            const request = indexedDB.open(DB_NAME, 1);
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains(DB_STORE)) {
+                    db.createObjectStore(DB_STORE);
+                }
+            };
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    async function writeToIndexedDB(key, value) {
+        try {
+            const db = await openIndexedDB();
+            await new Promise((resolve, reject) => {
+                const tx = db.transaction(DB_STORE, 'readwrite');
+                tx.objectStore(DB_STORE).put(value, key);
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => reject(tx.error);
+            });
+            db.close();
+        } catch (error) {
+            console.warn('Falha ao salvar no IndexedDB:', error);
+        }
+    }
+
+    async function readFromIndexedDB(key) {
+        try {
+            const db = await openIndexedDB();
+            const value = await new Promise((resolve, reject) => {
+                const tx = db.transaction(DB_STORE, 'readonly');
+                const request = tx.objectStore(DB_STORE).get(key);
+                request.onsuccess = () => resolve(request.result || null);
+                request.onerror = () => reject(request.error);
+            });
+            db.close();
+            return value;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    async function removeFromIndexedDB(key) {
+        try {
+            const db = await openIndexedDB();
+            await new Promise((resolve, reject) => {
+                const tx = db.transaction(DB_STORE, 'readwrite');
+                tx.objectStore(DB_STORE).delete(key);
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => reject(tx.error);
+            });
+            db.close();
+        } catch (error) {
+            console.warn('Falha ao remover do IndexedDB:', error);
+        }
+    }
+
+    function exportToPdf() {
+        if (isEditing) {
+            disableEditing();
+        }
+        showStatus('Preparando layout para PDF...');
+        setTimeout(() => {
+            window.print();
+        }, 120);
+    }
+
+    function exportBackupFile() {
+        const payload = {
+            exportedAt: new Date().toISOString(),
+            source: 'dr-cross-cloud',
+            version: 1,
+            html: getCleanSnapshotHTML()
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+        a.href = url;
+        a.download = `dr-cross-cloud-backup-${stamp}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showStatus('Backup exportado com sucesso.');
+    }
+
+    async function importBackupFile(file) {
+        try {
+            const text = await file.text();
+            const payload = JSON.parse(text);
+            if (!payload || typeof payload.html !== 'string') {
+                throw new Error('Formato de backup invalido.');
+            }
+
+            contentArea.innerHTML = payload.html;
+            localStorage.setItem(STORAGE_KEY, payload.html);
+            await writeToIndexedDB(DB_KEY, payload.html);
+
+            showStatus('Backup importado e aplicado com sucesso ✅');
+        } catch (error) {
+            showStatus('Falha ao importar backup. Verifique o arquivo JSON.');
         }
     }
 });
